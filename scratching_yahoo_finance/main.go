@@ -15,7 +15,7 @@ func main() {
 
 	tickers := make(map[string]struct{})
 
-	file, err := os.Open("scratching_yahoo_finance/screener_file/nasdaq_screener_1626544763604.csv")
+	file, err := os.Open("screener_file/nasdaq_screener_1626544763604.csv")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -43,19 +43,19 @@ func main() {
 
 	wg := sync.WaitGroup{}
 	wg.Add(len(tickers))
+	limit := make(chan struct{}, 100)
 
 	getInfo := func(ticker string) {
 		defer wg.Done()
 		requests.GetProfile(ticker, &invalidTickers, &errorTickers, &validTickers)
+		<-limit
 	}
 
 	start := time.Now()
 
 	count := 0
 	for ticker, _ := range tickers {
-		if count%100 == 0 {
-			time.Sleep(4 * time.Second)
-		}
+		limit <- struct{}{}
 		go getInfo(ticker)
 		count++
 	}
