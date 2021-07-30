@@ -13,21 +13,8 @@ import (
 const profileModule = "assetProfile"
 const earningsModule = "earnings"
 
-type AssetProfile struct {
-	Address1            string
-	City                string
-	State               string
-	Country             string
-	Phone               string
-	Website             string
-	Industry            string
-	Sector              string
-	LongBusinessSummary string
-	FullTimeEmployees   float64
-}
-
 type Year struct {
-	Date    float64
+	Date    int
 	Revenue struct {
 		Raw     float64
 		Fmt     string
@@ -57,7 +44,18 @@ type Quarter struct {
 type Profile struct {
 	QuoteSummary struct {
 		Result []struct {
-			AssetProfile
+			AssetProfile struct {
+				Address1            string
+				City                string
+				State               string
+				Country             string
+				Phone               string
+				Website             string
+				Industry            string
+				Sector              string
+				LongBusinessSummary string
+				FullTimeEmployees   float64
+			}
 		}
 		Error interface{}
 	}

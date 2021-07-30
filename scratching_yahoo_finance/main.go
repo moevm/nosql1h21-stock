@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"log"
+	"math"
 	"nosql1h21-stock/scratching_yahoo_finance/requests"
 	"os"
 	"strings"
@@ -86,6 +87,5 @@ func printSyncMapLength(m *sync.Map, msg string, countTickers int) {
 
 func printScratchDuration(duration time.Duration) {
 	duration = duration.Round(time.Second)
-	seconds := int(duration.Seconds()) % 60
-	fmt.Printf("Duration %.f min %d sec \n", duration.Minutes(), seconds)
+	fmt.Printf("Duration: %d min %.f sec\n", int(duration.Minutes()), math.Mod(duration.Seconds(), 60))
 }
