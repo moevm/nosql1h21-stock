@@ -40,7 +40,9 @@ func main() {
 
 	var invalidTickers sync.Map
 	var errorTickers sync.Map
-	var validTickers sync.Map
+	var tickerProfiles sync.Map
+	var tickerEarnings sync.Map
+	var tickerFinancialData sync.Map
 
 	wg := sync.WaitGroup{}
 	wg.Add(len(tickers))
@@ -48,44 +50,87 @@ func main() {
 
 	getInfo := func(ticker string) {
 		defer wg.Done()
-		requests.GetProfile(ticker, &invalidTickers, &errorTickers, &validTickers)
+		requests.GetProfile(ticker, &invalidTickers, &errorTickers, &tickerProfiles)
 		<-limit
 	}
 
-	start := time.Now()
-
-	count := 0
-	for ticker, _ := range tickers {
-		limit <- struct{}{}
-		go getInfo(ticker)
-		count++
+	getEarnings := func(ticker string) {
+		defer wg.Done()
+		requests.GetEarnings(ticker, &invalidTickers, &errorTickers, &tickerEarnings)
+		<-limit
 	}
 
-	wg.Wait()
-	duration := time.Since(start)
+	getFinancialData := func(ticker string) {
+		defer wg.Done()
+		requests.GetFinancialData(ticker, &invalidTickers, &errorTickers, &tickerFinancialData)
+		<-limit
+	}
 
-	printSyncMapLength(&invalidTickers, "Invalid Tickers count", len(tickers))
-	printSyncMapLength(&errorTickers, "Error Tickers count", len(tickers))
-	printSyncMapLength(&validTickers, "Valid Tickers count", len(tickers))
-	printScratchDuration(duration)
+	getResponseForMap(&invalidTickers, &errorTickers, &tickerProfiles, &tickers, &wg, getInfo, len(tickers), limit)
+	wg = sync.WaitGroup{}
+	getResponse(&invalidTickers, &errorTickers, &tickerEarnings, &tickerProfiles, &wg, getEarnings, len(tickers), limit)
+	wg = sync.WaitGroup{}
+	getResponse(&invalidTickers, &errorTickers, &tickerFinancialData, &tickerEarnings, &wg, getFinancialData, len(tickers), limit)
 
-	/*requests.GetEarnings("AAPL", &invalidTickers, &errorTickers, &validTickers)
+	/*ticker:= "AAPL"
 
-	if v , ok := validTickers.Load("AAPL"); ok {
-		fmt.Println(v)
+	requests.GetFinancialData(ticker, &invalidTickers, &errorTickers, &tickerFinancialData)
+
+	if v , ok := tickerFinancialData.Load(ticker); ok {
+		fmt.Println(v.(requests.FinancialData).TotalCash)
 	}*/
 }
 
-func printSyncMapLength(m *sync.Map, msg string, countTickers int) {
-	count := 0
-	m.Range(func(key interface{}, value interface{}) bool {
-		count++
+func getResponse(invalidTickers *sync.Map, errorTickers *sync.Map, validTickers *sync.Map, iterateMap *sync.Map, wg *sync.WaitGroup, doRequests func(ticket string), tickerCount int, limit chan struct{}) {
+	start := time.Now()
+	count := syncMapLen(iterateMap)
+
+	wg.Add(count)
+
+	iterateMap.Range(func(key interface{}, value interface{}) bool {
+		limit <- struct{}{}
+		go doRequests(key.(string))
 		return true
 	})
+
+	wg.Wait()
+	printRequestResults(invalidTickers, errorTickers, validTickers, time.Since(start), tickerCount)
+}
+
+func getResponseForMap(invalidTickers *sync.Map, errorTickers *sync.Map, validTickers *sync.Map, tickers *map[string]struct{}, wg *sync.WaitGroup, doRequests func(ticket string), tickerCount int, limit chan struct{}) {
+	start := time.Now()
+
+	for ticker, _ := range *tickers {
+		limit <- struct{}{}
+		go doRequests(ticker)
+	}
+
+	wg.Wait()
+	printRequestResults(invalidTickers, errorTickers, validTickers, time.Since(start), tickerCount)
+}
+
+func printRequestResults(invalidTickers *sync.Map, errorTickers *sync.Map, validTickers *sync.Map, duration time.Duration, countTickers int) {
+	printSyncMapLength(invalidTickers, "Invalid Tickers count", countTickers)
+	printSyncMapLength(errorTickers, "Error Tickers count", countTickers)
+	printSyncMapLength(validTickers, "Valid Tickers count", countTickers)
+	printScratchDuration(duration)
+}
+
+func printSyncMapLength(m *sync.Map, msg string, countTickers int) {
+	count := syncMapLen(m)
 	fmt.Printf("%s %d/%d\n", msg, count, countTickers)
 }
 
 func printScratchDuration(duration time.Duration) {
 	duration = duration.Round(time.Second)
 	fmt.Printf("Duration: %d min %.f sec\n", int(duration.Minutes()), math.Mod(duration.Seconds(), 60))
+}
+
+func syncMapLen(m *sync.Map) int {
+	length := 0
+	m.Range(func(key interface{}, value interface{}) bool {
+		length++
+		return true
+	})
+	return length
 }

@@ -12,69 +12,7 @@ import (
 
 const profileModule = "assetProfile"
 const earningsModule = "earnings"
-
-type Year struct {
-	Date    int
-	Revenue struct {
-		Raw     float64
-		Fmt     string
-		LongFmt string
-	}
-	Earnings struct {
-		Raw     float64
-		Fmt     string
-		LongFmt string
-	}
-}
-
-type Quarter struct {
-	Date    string
-	Revenue struct {
-		Raw     float64
-		Fmt     string
-		LongFmt string
-	}
-	Earnings struct {
-		Raw     float64
-		Fmt     string
-		LongFmt string
-	}
-}
-
-type Profile struct {
-	QuoteSummary struct {
-		Result []struct {
-			AssetProfile struct {
-				Address1            string
-				City                string
-				State               string
-				Country             string
-				Phone               string
-				Website             string
-				Industry            string
-				Sector              string
-				LongBusinessSummary string
-				FullTimeEmployees   float64
-			}
-		}
-		Error interface{}
-	}
-}
-
-type Earnings struct {
-	QuoteSummary struct {
-		Result []struct {
-			Earnings struct {
-				FinancialsChart struct {
-					Yearly    []Year
-					Quarterly []Quarter
-				}
-				FinancialCurrency string
-			}
-		}
-		Error interface{}
-	}
-}
+const financialDataModule = "financialData"
 
 func getBody(ticker *string, module string, errorTickers *sync.Map) *[]byte {
 	client := http.Client{
@@ -151,4 +89,29 @@ func GetEarnings(ticker string, invalidTickers *sync.Map, errorTickers *sync.Map
 	}
 
 	validTickers.Store(ticker, earnings.QuoteSummary.Result[0].Earnings)
+}
+
+func GetFinancialData(ticker string, invalidTickers *sync.Map, errorTickers *sync.Map, validTickers *sync.Map) {
+	body := getBody(&ticker, financialDataModule, errorTickers)
+
+	if body == nil {
+		return
+	}
+
+	finData := Financials{}
+	err := json.Unmarshal(*body, &finData)
+
+	if err != nil {
+		errorTickers.Store(ticker, struct{}{})
+		log.Println("Json unmarshal error:", err, "ticker", ticker)
+		return
+	}
+
+	if finData.QuoteSummary.Error != nil {
+		invalidTickers.Store(ticker, struct{}{})
+		log.Printf("Ticker %5s was not found", ticker)
+		return
+	}
+
+	validTickers.Store(ticker, finData.QuoteSummary.Result[0].FinancialData)
 }
