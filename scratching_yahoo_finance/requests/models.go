@@ -23,31 +23,15 @@ type AssetProfile struct {
 }
 
 type Year struct {
-	Date    int
-	Revenue struct {
-		Raw     float64
-		Fmt     string
-		LongFmt string
-	}
-	Earnings struct {
-		Raw     float64
-		Fmt     string
-		LongFmt string
-	}
+	Date     int
+	Revenue  Content
+	Earnings Content
 }
 
 type Quarter struct {
-	Date    string
-	Revenue struct {
-		Raw     float64
-		Fmt     string
-		LongFmt string
-	}
-	Earnings struct {
-		Raw     float64
-		Fmt     string
-		LongFmt string
-	}
+	Date     string
+	Revenue  Content
+	Earnings Content
 }
 
 type Earnings struct {
@@ -75,52 +59,26 @@ type Financials struct {
 }
 
 type FinancialData struct {
-	TotalCash struct {
-		Raw     float64
-		Fmt     string
-		LongFmt string
-	}
-	TotalCashPerShare struct {
-		Raw float64
-		Fmt string
-	}
-	Ebitda struct {
-		Raw     float64
-		Fmt     string
-		LongFmt string
-	}
-	TotalDebt struct {
-		Raw     float64
-		Fmt     string
-		LongFmt string
-	}
-	QuickRatio struct {
-		Raw float64
-		Fmt string
-	}
-	CurrentRatio struct {
-		Raw float64
-		Fmt string
-	}
-	TotalRevenue struct {
-		Raw     float64
-		Fmt     string
-		LongFmt string
-	}
-	RevenuePerShare struct {
-		Raw float64
-		Fmt string
-	}
-	DebtToEquity struct {
-		Raw float64
-		Fmt string
-	}
-	ReturnOnAssets struct {
-		Raw float64
-		Fmt string
-	}
-	ReturnOnEquity struct {
-		Raw float64
-		Fmt string
-	}
+	TotalCash         Content
+	TotalCashPerShare ReducedContent
+	Ebitda            Content
+	TotalDebt         Content
+	QuickRatio        ReducedContent
+	CurrentRatio      ReducedContent
+	TotalRevenue      Content
+	RevenuePerShare   ReducedContent
+	DebtToEquity      ReducedContent
+	ReturnOnAssets    ReducedContent
+	ReturnOnEquity    ReducedContent
+}
+
+type Content struct {
+	Raw     float64
+	Fmt     string
+	LongFmt string
+}
+
+type ReducedContent struct {
+	Raw float64
+	Fmt string
 }
