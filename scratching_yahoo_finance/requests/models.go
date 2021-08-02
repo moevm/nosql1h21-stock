@@ -2,10 +2,12 @@ package requests
 
 import "encoding/json"
 
-type Profile struct {
+type Data struct {
 	QuoteSummary struct {
 		Result []struct {
-			AssetProfile AssetProfile
+			AssetProfile  AssetProfile
+			Earnings      Earnings
+			FinancialData FinancialData
 		}
 		Error interface{}
 	}
@@ -24,40 +26,12 @@ type AssetProfile struct {
 	FullTimeEmployees   float64
 }
 
-type Year struct {
-	Date     int
-	Revenue  Content
-	Earnings Content
-}
-
-type Quarter struct {
-	Date     string
-	Revenue  Content
-	Earnings Content
-}
-
 type Earnings struct {
-	QuoteSummary struct {
-		Result []struct {
-			Earnings struct {
-				FinancialsChart struct {
-					Yearly    []Year
-					Quarterly []Quarter
-				}
-				FinancialCurrency string
-			}
-		}
-		Error interface{}
+	FinancialsChart struct {
+		Yearly    []Year
+		Quarterly []Quarter
 	}
-}
-
-type Financials struct {
-	QuoteSummary struct {
-		Result []struct {
-			FinancialData FinancialData
-		}
-		Error interface{}
-	}
+	FinancialCurrency string
 }
 
 type FinancialData struct {
@@ -72,6 +46,18 @@ type FinancialData struct {
 	DebtToEquity      Content
 	ReturnOnAssets    Content
 	ReturnOnEquity    Content
+}
+
+type Year struct {
+	Date     int
+	Revenue  Content
+	Earnings Content
+}
+
+type Quarter struct {
+	Date     string
+	Revenue  Content
+	Earnings Content
 }
 
 type contentAlias = struct {

@@ -47,16 +47,15 @@ func jsonToString(j []byte) string {
 	return buf.String()
 }
 
-func GetProfile(ticker string, invalidTickers *sync.Map, errorTickers *sync.Map, validTickers *sync.Map) {
-	body := getBody(&ticker, profileModule, errorTickers)
+func GetData(ticker string, invalidTickers *sync.Map, errorTickers *sync.Map, validTickers *sync.Map) {
+	body := getBody(&ticker, setModules(profileModule, earningsModule, financialDataModule), errorTickers)
 
 	if body == nil {
 		return
 	}
 
-	profile := Profile{}
-
-	err := json.Unmarshal(*body, &profile)
+	data := Data{}
+	err := json.Unmarshal(*body, &data)
 
 	if err != nil {
 		errorTickers.Store(ticker, struct{}{})
@@ -64,61 +63,34 @@ func GetProfile(ticker string, invalidTickers *sync.Map, errorTickers *sync.Map,
 		return
 	}
 
-	if profile.QuoteSummary.Error != nil {
+	if data.QuoteSummary.Error != nil {
 		invalidTickers.Store(ticker, struct{}{})
 		log.Printf("Ticker %5s was not found", ticker)
 		return
 	}
 
-	validTickers.Store(ticker, profile.QuoteSummary.Result[0].AssetProfile)
+	earnings := data.QuoteSummary.Result[0].Earnings
+	if earnings.FinancialCurrency == "" || len(earnings.FinancialsChart.Quarterly) == 0 ||
+		len(earnings.FinancialsChart.Yearly) == 0 {
+		invalidTickers.Store(ticker, struct{}{})
+		log.Printf("Ticker %5s hasn't earnings data", ticker)
+		return
+	}
+
+	finData := data.QuoteSummary.Result[0].FinancialData
+	if finData.TotalCash.Raw == 0 {
+		invalidTickers.Store(ticker, struct{}{})
+		log.Printf("Ticker %5s hasn't financial data", ticker)
+		return
+	}
+
+	validTickers.Store(ticker, data.QuoteSummary.Result[0])
 }
 
-func GetEarnings(ticker string, invalidTickers *sync.Map, errorTickers *sync.Map, validTickers *sync.Map) {
-	body := getBody(&ticker, earningsModule, errorTickers)
-
-	if body == nil {
-		return
+func setModules(v ...string) string {
+	modules := v[0]
+	for i := 1; i < len(v); i++ {
+		modules = modules + "," + v[i]
 	}
-
-	earnings := Earnings{}
-	err := json.Unmarshal(*body, &earnings)
-
-	if err != nil {
-		errorTickers.Store(ticker, struct{}{})
-		log.Println("Json unmarshal error:", err, "ticker", ticker, jsonToString(*body))
-		return
-	}
-
-	if earnings.QuoteSummary.Error != nil {
-		invalidTickers.Store(ticker, struct{}{})
-		log.Printf("Ticker %5s was not found", ticker)
-		return
-	}
-
-	validTickers.Store(ticker, earnings.QuoteSummary.Result[0].Earnings)
-}
-
-func GetFinancialData(ticker string, invalidTickers *sync.Map, errorTickers *sync.Map, validTickers *sync.Map) {
-	body := getBody(&ticker, financialDataModule, errorTickers)
-
-	if body == nil {
-		return
-	}
-
-	finData := Financials{}
-	err := json.Unmarshal(*body, &finData)
-
-	if err != nil {
-		errorTickers.Store(ticker, struct{}{})
-		log.Println("Json unmarshal error:", err, "ticker", ticker, jsonToString(*body))
-		return
-	}
-
-	if finData.QuoteSummary.Error != nil {
-		invalidTickers.Store(ticker, struct{}{})
-		log.Printf("Ticker %5s was not found", ticker)
-		return
-	}
-
-	validTickers.Store(ticker, finData.QuoteSummary.Result[0].FinancialData)
+	return modules
 }

@@ -40,73 +40,39 @@ func main() {
 
 	var invalidTickers sync.Map
 	var errorTickers sync.Map
-	var tickerProfiles sync.Map
-	var tickerEarnings sync.Map
-	var tickerFinancialData sync.Map
+	var validTickers sync.Map
 
 	wg := sync.WaitGroup{}
 	wg.Add(len(tickers))
 	limit := make(chan struct{}, 100)
 
-	getInfo := func(ticker string) {
+	getData := func(ticker string) {
 		defer wg.Done()
-		requests.GetProfile(ticker, &invalidTickers, &errorTickers, &tickerProfiles)
+		requests.GetData(ticker, &invalidTickers, &errorTickers, &validTickers)
 		<-limit
 	}
 
-	getEarnings := func(ticker string) {
-		defer wg.Done()
-		requests.GetEarnings(ticker, &invalidTickers, &errorTickers, &tickerEarnings)
-		<-limit
+	start := time.Now()
+
+	for ticker, _ := range tickers {
+		limit <- struct{}{}
+		go getData(ticker)
 	}
 
-	getFinancialData := func(ticker string) {
-		defer wg.Done()
-		requests.GetFinancialData(ticker, &invalidTickers, &errorTickers, &tickerFinancialData)
-		<-limit
-	}
+	wg.Wait()
+	printRequestResults(&invalidTickers, &errorTickers, &validTickers, time.Since(start), len(tickers))
 
-	getResponseForMap(&invalidTickers, &errorTickers, &tickerProfiles, &tickers, &wg, getInfo, len(tickers), limit)
-	wg = sync.WaitGroup{}
-	getResponse(&invalidTickers, &errorTickers, &tickerEarnings, &tickerProfiles, &wg, getEarnings, len(tickers), limit)
-	wg = sync.WaitGroup{}
-	getResponse(&invalidTickers, &errorTickers, &tickerFinancialData, &tickerEarnings, &wg, getFinancialData, len(tickers), limit)
+	/*ticker := "AAPL"
 
-	/*ticker:= "AAPL"
+	requests.GetData(ticker, &invalidTickers, &errorTickers, &validTickers)
 
-	requests.GetFinancialData(ticker, &invalidTickers, &errorTickers, &tickerFinancialData)
-
-	if v , ok := tickerFinancialData.Load(ticker); ok {
-		fmt.Println(v.(requests.FinancialData).TotalCash)
+	if v, ok := validTickers.Load(ticker); ok {
+		fmt.Println(v.(struct {
+			AssetProfile  requests.AssetProfile
+			Earnings      requests.Earnings
+			FinancialData requests.FinancialData
+		}))
 	}*/
-}
-
-func getResponse(invalidTickers *sync.Map, errorTickers *sync.Map, validTickers *sync.Map, iterateMap *sync.Map, wg *sync.WaitGroup, doRequests func(ticket string), tickerCount int, limit chan struct{}) {
-	start := time.Now()
-	count := syncMapLen(iterateMap)
-
-	wg.Add(count)
-
-	iterateMap.Range(func(key interface{}, value interface{}) bool {
-		limit <- struct{}{}
-		go doRequests(key.(string))
-		return true
-	})
-
-	wg.Wait()
-	printRequestResults(invalidTickers, errorTickers, validTickers, time.Since(start), tickerCount)
-}
-
-func getResponseForMap(invalidTickers *sync.Map, errorTickers *sync.Map, validTickers *sync.Map, tickers *map[string]struct{}, wg *sync.WaitGroup, doRequests func(ticket string), tickerCount int, limit chan struct{}) {
-	start := time.Now()
-
-	for ticker, _ := range *tickers {
-		limit <- struct{}{}
-		go doRequests(ticker)
-	}
-
-	wg.Wait()
-	printRequestResults(invalidTickers, errorTickers, validTickers, time.Since(start), tickerCount)
 }
 
 func printRequestResults(invalidTickers *sync.Map, errorTickers *sync.Map, validTickers *sync.Map, duration time.Duration, countTickers int) {
