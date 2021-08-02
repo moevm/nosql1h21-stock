@@ -1,6 +1,7 @@
 package requests
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -53,7 +54,9 @@ func GetProfile(ticker string, invalidTickers *sync.Map, errorTickers *sync.Map,
 
 	if err != nil {
 		errorTickers.Store(ticker, struct{}{})
-		log.Println("Json unmarshal error:", err, "ticker", ticker)
+		buf := bytes.Buffer{}
+		json.Indent(&buf, *body, "", "  ")
+		log.Println("Json unmarshal error:", err, "ticker", ticker, buf.String())
 		return
 	}
 
