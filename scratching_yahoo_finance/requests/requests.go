@@ -41,6 +41,12 @@ func getBody(ticker *string, module string, errorTickers *sync.Map) *[]byte {
 	return &body
 }
 
+func jsonToString(j []byte) string {
+	buf := bytes.Buffer{}
+	json.Indent(&buf, j, "", "  ")
+	return buf.String()
+}
+
 func GetProfile(ticker string, invalidTickers *sync.Map, errorTickers *sync.Map, validTickers *sync.Map) {
 	body := getBody(&ticker, profileModule, errorTickers)
 
@@ -54,9 +60,7 @@ func GetProfile(ticker string, invalidTickers *sync.Map, errorTickers *sync.Map,
 
 	if err != nil {
 		errorTickers.Store(ticker, struct{}{})
-		buf := bytes.Buffer{}
-		json.Indent(&buf, *body, "", "  ")
-		log.Println("Json unmarshal error:", err, "ticker", ticker, buf.String())
+		log.Println("Json unmarshal error:", err, "ticker", ticker, jsonToString(*body))
 		return
 	}
 
@@ -81,7 +85,7 @@ func GetEarnings(ticker string, invalidTickers *sync.Map, errorTickers *sync.Map
 
 	if err != nil {
 		errorTickers.Store(ticker, struct{}{})
-		log.Println("Json unmarshal error:", err, "ticker", ticker)
+		log.Println("Json unmarshal error:", err, "ticker", ticker, jsonToString(*body))
 		return
 	}
 
@@ -106,7 +110,7 @@ func GetFinancialData(ticker string, invalidTickers *sync.Map, errorTickers *syn
 
 	if err != nil {
 		errorTickers.Store(ticker, struct{}{})
-		log.Println("Json unmarshal error:", err, "ticker", ticker)
+		log.Println("Json unmarshal error:", err, "ticker", ticker, jsonToString(*body))
 		return
 	}
 
