@@ -1,5 +1,7 @@
 package requests
 
+import "encoding/json"
+
 type Profile struct {
 	QuoteSummary struct {
 		Result []struct {
@@ -60,25 +62,27 @@ type Financials struct {
 
 type FinancialData struct {
 	TotalCash         Content
-	TotalCashPerShare ReducedContent
+	TotalCashPerShare Content
 	Ebitda            Content
 	TotalDebt         Content
-	QuickRatio        ReducedContent
-	CurrentRatio      ReducedContent
+	QuickRatio        Content
+	CurrentRatio      Content
 	TotalRevenue      Content
-	RevenuePerShare   ReducedContent
-	DebtToEquity      ReducedContent
-	ReturnOnAssets    ReducedContent
-	ReturnOnEquity    ReducedContent
+	RevenuePerShare   Content
+	DebtToEquity      Content
+	ReturnOnAssets    Content
+	ReturnOnEquity    Content
 }
 
-type Content struct {
-	Raw     float64
-	Fmt     string
-	LongFmt string
-}
-
-type ReducedContent struct {
+type contentAlias = struct {
 	Raw float64
-	Fmt string
+}
+type Content contentAlias
+
+func (c *Content) UnmarshalJSON(b []byte) error {
+	err := json.Unmarshal(b, (*contentAlias)(c))
+	if err != nil {
+		err = json.Unmarshal(b, &c.Raw)
+	}
+	return err
 }
