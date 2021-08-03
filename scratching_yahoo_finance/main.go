@@ -45,6 +45,7 @@ func main() {
 
 	if v, ok := validTickers.Load(ticker); ok {
 		fmt.Println(v.(struct {
+			Price requests.Price
 			AssetProfile  requests.AssetProfile
 			Earnings      requests.Earnings
 			FinancialData requests.FinancialData

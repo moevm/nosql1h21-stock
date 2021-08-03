@@ -11,6 +11,7 @@ import (
 	"time"
 )
 
+const priceModule = "price"
 const profileModule = "assetProfile"
 const earningsModule = "earnings"
 const financialDataModule = "financialData"
@@ -48,7 +49,7 @@ func jsonToString(j []byte) string {
 }
 
 func GetData(ticker string, invalidTickers *sync.Map, errorTickers *sync.Map, validTickers *sync.Map) {
-	body := getBody(&ticker, setModules(profileModule, earningsModule, financialDataModule), errorTickers)
+	body := getBody(&ticker, setModules(priceModule, profileModule, earningsModule, financialDataModule), errorTickers)
 
 	if body == nil {
 		return
@@ -81,6 +82,11 @@ func GetData(ticker string, invalidTickers *sync.Map, errorTickers *sync.Map, va
 	if finData.TotalCash.Raw == 0 {
 		invalidTickers.Store(ticker, struct{}{})
 		log.Printf("Ticker %5s hasn't financial data", ticker)
+		return
+	}
+
+	if names := data.QuoteSummary.Result[0].Price; names.ShortName == "" || names.LongName == "" {
+		log.Printf("Ticker %5s hasn't short or long name", ticker)
 		return
 	}
 

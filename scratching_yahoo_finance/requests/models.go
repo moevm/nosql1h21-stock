@@ -5,12 +5,18 @@ import "encoding/json"
 type Data struct {
 	QuoteSummary struct {
 		Result []struct {
+			Price         Price
 			AssetProfile  AssetProfile
 			Earnings      Earnings
 			FinancialData FinancialData
 		}
 		Error interface{}
 	}
+}
+
+type Price struct {
+	ShortName string
+	LongName  string
 }
 
 type AssetProfile struct {
