@@ -148,16 +148,6 @@ func main() {
 		log.Fatal(insertErr)
 	}
 
-	/*err = client.Ping(ctx, readpref.Primary())
-	if err != nil {
-		log.Fatal(err)
-	}*/
-	/*databases, err := client.ListDatabaseNames(ctx, bson.M{})
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println(databases)*/
-
 	/*ticker := "AAPL"
 
 	requests.GetData(ticker, &invalidTickers, &errorTickers, &validTickers)
