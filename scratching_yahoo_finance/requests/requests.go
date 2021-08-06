@@ -79,7 +79,7 @@ func GetData(ticker string, invalidTickers *sync.Map, errorTickers *sync.Map, va
 	}
 
 	finData := data.QuoteSummary.Result[0].FinancialData
-	if finData.TotalCash.Raw == 0 {
+	if finData.TotalCash == 0 {
 		invalidTickers.Store(ticker, struct{}{})
 		log.Printf("Ticker %5s hasn't financial data", ticker)
 		return

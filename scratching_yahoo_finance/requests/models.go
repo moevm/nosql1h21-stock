@@ -1,6 +1,8 @@
 package requests
 
-import "encoding/json"
+import (
+	"encoding/json"
+)
 
 type Data struct {
 	QuoteSummary struct {
@@ -30,6 +32,15 @@ type AssetProfile struct {
 	Sector              string
 	LongBusinessSummary string
 	FullTimeEmployees   float64
+	CompanyOfficers     []CompanyOfficer
+}
+
+type CompanyOfficer struct {
+	Name     string
+	Age      int     `bson:"age,omitempty"`
+	Title    string  `bson:"title,omitempty"`
+	YearBorn int     `bson:"year born,omitempty"`
+	TotalPay Content `bson:"total pay,omitempty"`
 }
 
 type Earnings struct {
@@ -69,12 +80,16 @@ type Quarter struct {
 type contentAlias = struct {
 	Raw float64
 }
-type Content contentAlias
+
+type Content float64
 
 func (c *Content) UnmarshalJSON(b []byte) error {
-	err := json.Unmarshal(b, (*contentAlias)(c))
+	var alias contentAlias
+	err := json.Unmarshal(b, &alias)
 	if err != nil {
-		err = json.Unmarshal(b, &c.Raw)
+		err = json.Unmarshal(b, (*float64)(c))
+	} else {
+		*c = Content(alias.Raw)
 	}
 	return err
 }

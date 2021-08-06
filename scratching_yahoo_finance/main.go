@@ -3,26 +3,25 @@ package main
 import (
 	"context"
 	"fmt"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
 	"math"
+	"nosql1h21-stock/scratching_yahoo_finance/processing"
 	"sync"
 	"time"
 
-	"nosql1h21-stock/scratching_yahoo_finance/processing"
 	"nosql1h21-stock/scratching_yahoo_finance/requests"
-
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type Stock struct {
-	Symbol        string  `bson:"symbol"`
-	ShortName     string  `bson:"short name,omitempty"`
-	LongName      string  `bson:"long name,omitempty"`
-	Summary       string  `bson:"summary,omitempty"`
-	Industry      string  `bson:"industry,omitempty"`
-	Sector        string  `bson:"sector,omitempty"`
-	Employees     float64 `bson:"employees,omitempty"`
+	Symbol        string `bson:"symbol"`
+	ShortName     string `bson:"short name,omitempty"`
+	LongName      string `bson:"long name,omitempty"`
+	Summary       string `bson:"summary,omitempty"`
+	Industry      string `bson:"industry,omitempty"`
+	Sector        string `bson:"sector,omitempty"`
+	Staff         Staff
 	Locate        Locate
 	Contacts      Contacts
 	FinancialData FinancialData `bson:"financial data"`
@@ -39,6 +38,11 @@ type Locate struct {
 type Contacts struct {
 	Phone   string `bson:"phone,omitempty"`
 	Website string `bson:"website,omitempty"`
+}
+
+type Staff struct {
+	Employees       float64 `bson:"employees,omitempty"`
+	CompanyOfficers []requests.CompanyOfficer
 }
 
 type FinancialData struct {
@@ -114,7 +118,12 @@ func main() {
 			ShortName: data.Price.ShortName,
 			LongName:  data.Price.LongName,
 			Summary:   data.AssetProfile.LongBusinessSummary,
-			Employees: data.AssetProfile.FullTimeEmployees,
+			Industry:  data.AssetProfile.Industry,
+			Sector:    data.AssetProfile.Sector,
+			Staff: Staff{
+				Employees:       data.AssetProfile.FullTimeEmployees,
+				CompanyOfficers: data.AssetProfile.CompanyOfficers,
+			},
 			Locate: Locate{
 				Address: data.AssetProfile.Address1,
 				City:    data.AssetProfile.City,
@@ -126,17 +135,17 @@ func main() {
 				Website: data.AssetProfile.Website,
 			},
 			FinancialData: FinancialData{
-				TotalCash:         data.FinancialData.TotalCash.Raw,
-				TotalCashPerShare: data.FinancialData.TotalCashPerShare.Raw,
-				Ebitda:            data.FinancialData.TotalCash.Raw,
-				TotalDebt:         data.FinancialData.TotalDebt.Raw,
-				QuickRatio:        data.FinancialData.QuickRatio.Raw,
-				CurrentRatio:      data.FinancialData.CurrentRatio.Raw,
-				TotalRevenue:      data.FinancialData.TotalRevenue.Raw,
-				RevenuePerShare:   data.FinancialData.RevenuePerShare.Raw,
-				DebtToEquity:      data.FinancialData.DebtToEquity.Raw,
-				ReturnOnAssets:    data.FinancialData.ReturnOnAssets.Raw,
-				ReturnOnEquity:    data.FinancialData.ReturnOnEquity.Raw,
+				TotalCash:         float64(data.FinancialData.TotalCash),
+				TotalCashPerShare: float64(data.FinancialData.TotalCashPerShare),
+				Ebitda:            float64(data.FinancialData.TotalCash),
+				TotalDebt:         float64(data.FinancialData.TotalDebt),
+				QuickRatio:        float64(data.FinancialData.QuickRatio),
+				CurrentRatio:      float64(data.FinancialData.CurrentRatio),
+				TotalRevenue:      float64(data.FinancialData.TotalRevenue),
+				RevenuePerShare:   float64(data.FinancialData.RevenuePerShare),
+				DebtToEquity:      float64(data.FinancialData.DebtToEquity),
+				ReturnOnAssets:    float64(data.FinancialData.ReturnOnAssets),
+				ReturnOnEquity:    float64(data.FinancialData.ReturnOnEquity),
 			},
 			Earnings: data.Earnings,
 		})
