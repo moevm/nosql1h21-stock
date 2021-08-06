@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"math"
+	"sort"
 	"sync"
 	"time"
 
@@ -105,53 +106,54 @@ func main() {
 
 	docs := []interface{}{}
 
-	validTickers.Range(func(key interface{}, value interface{}) bool {
+	for _, ticker := range *getKeys(&validTickers) {
+		if value, ok := validTickers.Load(ticker); ok {
+			data := value.(struct {
+				Price         requests.Price
+				AssetProfile  requests.AssetProfile
+				Earnings      requests.Earnings
+				FinancialData requests.FinancialData
+			})
 
-		data := value.(struct {
-			Price         requests.Price
-			AssetProfile  requests.AssetProfile
-			Earnings      requests.Earnings
-			FinancialData requests.FinancialData
-		})
+			docs = append(docs, Stock{
+				Symbol:    ticker,
+				ShortName: data.Price.ShortName,
+				LongName:  data.Price.LongName,
+				Summary:   data.AssetProfile.LongBusinessSummary,
+				Industry:  data.AssetProfile.Industry,
+				Sector:    data.AssetProfile.Sector,
+				Staff: Staff{
+					Employees:       data.AssetProfile.FullTimeEmployees,
+					CompanyOfficers: data.AssetProfile.CompanyOfficers,
+				},
+				Locate: Locate{
+					Address: data.AssetProfile.Address1,
+					City:    data.AssetProfile.City,
+					State:   data.AssetProfile.State,
+					Country: data.AssetProfile.Country,
+				},
+				Contacts: Contacts{
+					Phone:   data.AssetProfile.Phone,
+					Website: data.AssetProfile.Website,
+				},
+				FinancialData: FinancialData{
+					TotalCash:         float64(data.FinancialData.TotalCash),
+					TotalCashPerShare: float64(data.FinancialData.TotalCashPerShare),
+					Ebitda:            float64(data.FinancialData.TotalCash),
+					TotalDebt:         float64(data.FinancialData.TotalDebt),
+					QuickRatio:        float64(data.FinancialData.QuickRatio),
+					CurrentRatio:      float64(data.FinancialData.CurrentRatio),
+					TotalRevenue:      float64(data.FinancialData.TotalRevenue),
+					RevenuePerShare:   float64(data.FinancialData.RevenuePerShare),
+					DebtToEquity:      float64(data.FinancialData.DebtToEquity),
+					ReturnOnAssets:    float64(data.FinancialData.ReturnOnAssets),
+					ReturnOnEquity:    float64(data.FinancialData.ReturnOnEquity),
+				},
+				Earnings: data.Earnings,
+			})
 
-		docs = append(docs, Stock{
-			Symbol:    key.(string),
-			ShortName: data.Price.ShortName,
-			LongName:  data.Price.LongName,
-			Summary:   data.AssetProfile.LongBusinessSummary,
-			Industry:  data.AssetProfile.Industry,
-			Sector:    data.AssetProfile.Sector,
-			Staff: Staff{
-				Employees:       data.AssetProfile.FullTimeEmployees,
-				CompanyOfficers: data.AssetProfile.CompanyOfficers,
-			},
-			Locate: Locate{
-				Address: data.AssetProfile.Address1,
-				City:    data.AssetProfile.City,
-				State:   data.AssetProfile.State,
-				Country: data.AssetProfile.Country,
-			},
-			Contacts: Contacts{
-				Phone:   data.AssetProfile.Phone,
-				Website: data.AssetProfile.Website,
-			},
-			FinancialData: FinancialData{
-				TotalCash:         float64(data.FinancialData.TotalCash),
-				TotalCashPerShare: float64(data.FinancialData.TotalCashPerShare),
-				Ebitda:            float64(data.FinancialData.TotalCash),
-				TotalDebt:         float64(data.FinancialData.TotalDebt),
-				QuickRatio:        float64(data.FinancialData.QuickRatio),
-				CurrentRatio:      float64(data.FinancialData.CurrentRatio),
-				TotalRevenue:      float64(data.FinancialData.TotalRevenue),
-				RevenuePerShare:   float64(data.FinancialData.RevenuePerShare),
-				DebtToEquity:      float64(data.FinancialData.DebtToEquity),
-				ReturnOnAssets:    float64(data.FinancialData.ReturnOnAssets),
-				ReturnOnEquity:    float64(data.FinancialData.ReturnOnEquity),
-			},
-			Earnings: data.Earnings,
-		})
-		return true
-	})
+		}
+	}
 
 	_, insertErr := collection.InsertMany(ctx, docs)
 	if insertErr != nil {
@@ -196,4 +198,14 @@ func syncMapLen(m *sync.Map) int {
 		return true
 	})
 	return length
+}
+
+func getKeys(m *sync.Map) *[]string {
+	keys := make([]string, 0)
+	m.Range(func(key interface{}, value interface{}) bool {
+		keys = append(keys, key.(string))
+		return true
+	})
+	sort.Strings(keys)
+	return &keys
 }
