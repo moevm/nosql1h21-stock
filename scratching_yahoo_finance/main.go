@@ -3,15 +3,16 @@ package main
 import (
 	"context"
 	"fmt"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
 	"math"
-	"nosql1h21-stock/scratching_yahoo_finance/processing"
 	"sync"
 	"time"
 
+	"nosql1h21-stock/scratching_yahoo_finance/processing"
 	"nosql1h21-stock/scratching_yahoo_finance/requests"
+
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type Stock struct {
