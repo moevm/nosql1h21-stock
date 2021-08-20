@@ -5,15 +5,15 @@ import (
 	"sync"
 )
 
-type Cache struct {
+type ValidTickerCache struct {
 	data sync.Map
 }
 
-func NewCache() *Cache {
-	return &Cache{data: sync.Map{}}
+func NewCache() *ValidTickerCache {
+	return &ValidTickerCache{data: sync.Map{}}
 }
 
-func (c *Cache) Load(key string) ([]model.ValidTicker, bool) {
+func (c *ValidTickerCache) Load(key string) ([]model.ValidTicker, bool) {
 	value, ok := c.data.Load(key)
 	if !ok {
 		return []model.ValidTicker{}, false
@@ -22,6 +22,6 @@ func (c *Cache) Load(key string) ([]model.ValidTicker, bool) {
 	return p, ok
 }
 
-func (c *Cache) Store(key string, value []model.ValidTicker) {
+func (c *ValidTickerCache) Store(key string, value []model.ValidTicker) {
 	c.data.Store(key, value)
 }

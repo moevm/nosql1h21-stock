@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"sync"
 	"syscall"
 	"time"
 
@@ -45,8 +46,11 @@ func main() {
 
 	collection := mongoClient.Database("stock_market").Collection("stocks")
 
-	stockService := service.NewStockService(&logger, collection)
 	validTickersRepo := repository.NewCache()
+	validTickersMap := sync.Map{}
+	GetValidTickers(collection, &logger, validTickersRepo, &validTickersMap)
+
+	stockService := service.NewStockService(&logger, collection)
 	validTickersService := service.NewValidTickersService(&logger, validTickersRepo, collection)
 
 	stockHandler := handler.NewStockHandler(&logger, stockService)

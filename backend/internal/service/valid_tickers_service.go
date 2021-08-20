@@ -12,11 +12,11 @@ import (
 
 type ValidTickersService struct {
 	logger     *zerolog.Logger
-	cache      *repository.Cache
+	cache      *repository.ValidTickerCache
 	collection *mongo.Collection
 }
 
-func NewValidTickersService(logger *zerolog.Logger, cache *repository.Cache, collection *mongo.Collection) *ValidTickersService {
+func NewValidTickersService(logger *zerolog.Logger, cache *repository.ValidTickerCache, collection *mongo.Collection) *ValidTickersService {
 	return &ValidTickersService{
 		logger:     logger,
 		cache:      cache,

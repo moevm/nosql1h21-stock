@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"nosql1h21-stock-backend/backend/internal/model"
 	"nosql1h21-stock-backend/backend/internal/service"
+	"sync"
 )
 
 const (
@@ -13,8 +14,9 @@ const (
 )
 
 type StockHandler struct {
-	logger  *zerolog.Logger
-	service StocksService
+	logger          *zerolog.Logger
+	service         StocksService
+	validTickersMap *sync.Map
 }
 
 type StocksService interface {
@@ -30,6 +32,12 @@ func NewStockHandler(logger *zerolog.Logger, srv *service.StockService) *StockHa
 
 func (h *StockHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	ticker := chi.URLParam(r, "ticker")
+
+	if _, ok := h.validTickersMap.Load(ticker); !ok {
+		h.logger.Info().Msg("Unknown ticker " + ticker + " in request")
+		writeResponse(w, http.StatusBadRequest, model.Error{Error: "Unknown ticker"})
+		return
+	}
 
 	stock, err := h.service.GetAllData(ticker)
 	if err != nil {
