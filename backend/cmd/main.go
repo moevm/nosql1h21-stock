@@ -3,13 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
-	"go.mongodb.org/mongo-driver/mongo/readpref"
 	"net/http"
-	"nosql1h21-stock-backend/backend/internal/config"
-	"nosql1h21-stock-backend/backend/internal/handler"
-	"nosql1h21-stock-backend/backend/internal/service"
 	"os"
 	"os/signal"
 	"syscall"
@@ -18,6 +12,13 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/rs/zerolog"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/mongo/readpref"
+
+	"nosql1h21-stock-backend/backend/internal/config"
+	"nosql1h21-stock-backend/backend/internal/handler"
+	"nosql1h21-stock-backend/backend/internal/service"
 )
 
 func main() {
@@ -43,13 +44,17 @@ func main() {
 
 	collection := mongoClient.Database("stock_market").Collection("stocks")
 
-	service := service.New(&logger, collection)
-	h := handler.New(&logger, service)
+	stockService := service.NewStockService(&logger, collection)
+	validTickersService := service.NewValidTickersService(&logger, collection)
+
+	stockHandler := handler.NewStockHandler(&logger, stockService)
+	validTickersHandler := handler.NewValidTickersHandler(&logger, validTickersService)
 
 	r.Route("/", func(r chi.Router) {
 		r.Use(middleware.RequestLogger(&handler.LogFormatter{Logger: &logger}))
 		r.Use(middleware.Recoverer)
-		r.Method(http.MethodGet, handler.Path, h)
+		r.Method(http.MethodGet, handler.StockPath, stockHandler)
+		r.Method(http.MethodGet, handler.ValidTickersPath, validTickersHandler)
 	})
 
 	srv := http.Server{

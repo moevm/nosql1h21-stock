@@ -8,23 +8,22 @@ import (
 	"nosql1h21-stock-backend/backend/internal/model"
 )
 
-
-type Service struct {
-	logger *zerolog.Logger
+type StockService struct {
+	logger     *zerolog.Logger
 	collection *mongo.Collection
 }
 
-func New(logger *zerolog.Logger, collection *mongo.Collection) *Service {
-	return &Service{
-		logger: logger,
+func NewStockService(logger *zerolog.Logger, collection *mongo.Collection) *StockService {
+	return &StockService{
+		logger:     logger,
 		collection: collection,
 	}
 }
 
-func (s Service) GetAllData(ticker string) (model.Stock, error) {
+func (s StockService) GetAllData(ticker string) (model.Stock, error) {
 	filter := bson.D{{"symbol", ticker}}
 
-	result := s.collection.FindOne(context.TODO(), filter)
+	result := s.collection.FindOne(context.Background(), filter)
 	if result.Err() != nil {
 		return model.Stock{}, result.Err()
 	}

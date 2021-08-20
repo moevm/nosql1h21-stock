@@ -9,26 +9,26 @@ import (
 )
 
 const (
-	Path = "/stock/{ticker}"
+	StockPath = "/stock/{ticker}"
 )
 
-type Handler struct {
+type StockHandler struct {
 	logger  *zerolog.Logger
-	service Service
+	service StocksService
 }
 
-type Service interface {
+type StocksService interface {
 	GetAllData(ticker string) (model.Stock, error)
 }
 
-func New(logger *zerolog.Logger, srv *service.Service) *Handler {
-	return &Handler{
+func NewStockHandler(logger *zerolog.Logger, srv *service.StockService) *StockHandler {
+	return &StockHandler{
 		logger:  logger,
 		service: srv,
 	}
 }
 
-func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (h *StockHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	ticker := chi.URLParam(r, "ticker")
 
 	stock, err := h.service.GetAllData(ticker)

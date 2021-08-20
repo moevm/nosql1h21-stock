@@ -6,12 +6,12 @@ type Error struct {
 
 type Stock struct {
 	//ID            primitive.ObjectID `bson:"_id,omitempty"`
-	Symbol        string             `bson:"symbol"`
-	ShortName     string             `bson:"short name,omitempty"`
-	LongName      string             `bson:"long name,omitempty"`
-	Summary       string             `bson:"summary,omitempty"`
-	Industry      string             `bson:"industry,omitempty"`
-	Sector        string             `bson:"sector,omitempty"`
+	Symbol        string `bson:"symbol"`
+	ShortName     string `bson:"short name,omitempty"`
+	LongName      string `bson:"long name,omitempty"`
+	Summary       string `bson:"summary,omitempty"`
+	Industry      string `bson:"industry,omitempty"`
+	Sector        string `bson:"sector,omitempty"`
 	Staff         Staff
 	Locate        Locate
 	Contacts      Contacts
@@ -98,3 +98,8 @@ type Quarter struct {
 }
 
 type Content float64
+
+type ValidTicker struct {
+	Symbol    string `bson:"symbol"`
+	ShortName string `bson:"short name"`
+}
