@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"nosql1h21-stock-backend/backend/internal/repository"
 	"os"
 	"os/signal"
 	"syscall"
@@ -45,7 +46,8 @@ func main() {
 	collection := mongoClient.Database("stock_market").Collection("stocks")
 
 	stockService := service.NewStockService(&logger, collection)
-	validTickersService := service.NewValidTickersService(&logger, collection)
+	validTickersRepo := repository.NewCache()
+	validTickersService := service.NewValidTickersService(&logger, validTickersRepo, collection)
 
 	stockHandler := handler.NewStockHandler(&logger, stockService)
 	validTickersHandler := handler.NewValidTickersHandler(&logger, validTickersService)

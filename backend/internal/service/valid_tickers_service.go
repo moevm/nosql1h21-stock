@@ -6,22 +6,30 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"nosql1h21-stock-backend/backend/internal/model"
+	"nosql1h21-stock-backend/backend/internal/repository"
 	"time"
 )
 
 type ValidTickersService struct {
 	logger     *zerolog.Logger
+	cache      *repository.Cache
 	collection *mongo.Collection
 }
 
-func NewValidTickersService(logger *zerolog.Logger, collection *mongo.Collection) *ValidTickersService {
+func NewValidTickersService(logger *zerolog.Logger, cache *repository.Cache, collection *mongo.Collection) *ValidTickersService {
 	return &ValidTickersService{
 		logger:     logger,
+		cache:      cache,
 		collection: collection,
 	}
 }
 
 func (s ValidTickersService) GetValidTickers() (*[]model.ValidTicker, error) {
+
+	if p, ok := s.cache.Load("valid tickers"); ok {
+		s.logger.Info().Msg("Hit cache")
+		return &p, nil
+	}
 
 	var validTickers []model.ValidTicker
 
@@ -44,6 +52,9 @@ func (s ValidTickersService) GetValidTickers() (*[]model.ValidTicker, error) {
 	if err := cur.Err(); err != nil {
 		s.logger.Err(err).Send()
 	}
+
+	s.cache.Store("valid tickers", validTickers)
+	s.logger.Info().Msg("Store to cache")
 
 	return &validTickers, err
 }
