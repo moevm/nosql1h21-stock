@@ -33,7 +33,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	stock, err := h.service.GetAllData(ticker)
 	if err != nil {
-		h.logger.Error().Err(err).Msg("GetPrice method error")
+		h.logger.Error().Err(err).Msg("Get all data error")
 		writeResponse(w, http.StatusInternalServerError, model.Error{Error: "Internal server error"})
 		return
 	}
