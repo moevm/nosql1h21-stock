@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"nosql1h21-stock-backend/backend/internal/repository"
 	"os"
 	"os/signal"
 	"syscall"
@@ -19,6 +18,7 @@ import (
 
 	"nosql1h21-stock-backend/backend/internal/config"
 	"nosql1h21-stock-backend/backend/internal/handler"
+	"nosql1h21-stock-backend/backend/internal/repository"
 	"nosql1h21-stock-backend/backend/internal/service"
 )
 

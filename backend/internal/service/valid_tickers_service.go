@@ -35,7 +35,7 @@ func (s ValidTickersService) GetValidTickers() (*[]model.ValidTicker, error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
-	cur, err := s.collection.Find(ctx, bson.D{})
+	cur, err := s.collection.Find(ctx, bson.M{})
 	if err != nil {
 		s.logger.Err(err).Send()
 	}
