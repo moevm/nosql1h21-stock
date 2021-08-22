@@ -53,7 +53,7 @@ func main() {
 	stockService := service.NewStockService(&logger, collection)
 	validTickersService := service.NewValidTickersService(&logger, validTickersRepo, collection)
 
-	stockHandler := handler.NewStockHandler(&logger, stockService)
+	stockHandler := handler.NewStockHandler(&logger, stockService, &validTickersMap)
 	validTickersHandler := handler.NewValidTickersHandler(&logger, validTickersService)
 
 	r.Route("/", func(r chi.Router) {

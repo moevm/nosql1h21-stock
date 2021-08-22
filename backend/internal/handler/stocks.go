@@ -23,10 +23,11 @@ type StocksService interface {
 	GetAllData(ticker string) (model.Stock, error)
 }
 
-func NewStockHandler(logger *zerolog.Logger, srv *service.StockService) *StockHandler {
+func NewStockHandler(logger *zerolog.Logger, srv *service.StockService, validTickersMap *sync.Map) *StockHandler {
 	return &StockHandler{
-		logger:  logger,
-		service: srv,
+		logger:          logger,
+		service:         srv,
+		validTickersMap: validTickersMap,
 	}
 }
 
