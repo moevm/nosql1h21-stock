@@ -103,3 +103,9 @@ type ValidTicker struct {
 	Symbol    string `bson:"symbol"`
 	ShortName string `bson:"short name"`
 }
+
+type SortRequest struct {
+	Countries []string
+	Industry  string
+	Sector    string
+}

@@ -51,16 +51,20 @@ func main() {
 	GetValidTickers(collection, &logger, validTickersRepo, &validTickersMap)
 
 	stockService := service.NewStockService(&logger, collection)
-	validTickersService := service.NewValidTickersService(&logger, validTickersRepo, collection)
-
 	stockHandler := handler.NewStockHandler(&logger, stockService, &validTickersMap)
+
+	validTickersService := service.NewValidTickersService(&logger, validTickersRepo, collection)
 	validTickersHandler := handler.NewValidTickersHandler(&logger, validTickersService)
+
+	sortService := service.NewSortService(&logger, collection)
+	sortHandler := handler.NewSortHandler(&logger, sortService, &validTickersMap)
 
 	r.Route("/", func(r chi.Router) {
 		r.Use(middleware.RequestLogger(&handler.LogFormatter{Logger: &logger}))
 		r.Use(middleware.Recoverer)
 		r.Method(http.MethodGet, handler.StockPath, stockHandler)
 		r.Method(http.MethodGet, handler.ValidTickersPath, validTickersHandler)
+		r.Method(http.MethodPost, handler.SortPath, sortHandler)
 	})
 
 	srv := http.Server{

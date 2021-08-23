@@ -8,3 +8,12 @@ GET http://127.0.0.1:8080/stock/IBM
 
 ###
 GET http://127.0.0.1:8080/validTickers
+
+###
+POST http://127.0.0.1:8080/sort
+
+{
+    "countries": ["China","USA"],
+    "industry": "Internet Retail",
+    "sector": "Consumer Cyclical"
+}
