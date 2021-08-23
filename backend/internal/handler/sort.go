@@ -31,41 +31,16 @@ func NewSortHandler(logger *zerolog.Logger, srv *service.SortService, validTicke
 	}
 }
 
-func (h *SortHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (s *SortHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
-	/*query := r.URL.Query()
-	countryFilters, present := query["country"]
-
-	industryFilters, present := query["industry"]
-	if length:= len(industryFilters); !present || length == 0 || length > 1{
-		h.logger.Info().Msg("Invalid argument for request")
-		writeResponse(w, http.StatusBadRequest, model.Error{Error: "Invalid argument for request"})
-		return
-	}
-
-	sectorFilters, present := query["sector"]
-	if length:= len(sectorFilters); !present || length == 0 || length > 1 {
-		h.logger.Info().Msg("Invalid argument for request")
-		writeResponse(w, http.StatusBadRequest, model.Error{Error: "Invalid argument for request"})
-		return
-	}
-
-	validTickers ,err := h.service.SortData(countryFilters, industryFilters[0], sectorFilters[0])
-
-	if err !=nil {
-		_ = validTickers
-	}
-
-	writeResponse(w, http.StatusOK, validTickers)*/
-
-	u := model.SortRequest{}
-	err := json.NewDecoder(r.Body).Decode(&u)
+	sortRequest := model.SortRequest{}
+	err := json.NewDecoder(r.Body).Decode(&sortRequest)
 	if err != nil {
 		writeResponse(w, http.StatusBadRequest, model.Error{Error: "Invalid argument for request"})
 		return
 	}
 
-	validTickers, err := h.service.SortData(u.Countries, u.Industry, u.Sector)
+	validTickers, err := s.service.SortData(sortRequest.Countries, sortRequest.Sector, sortRequest.Industry)
 
 	if err != nil {
 		writeResponse(w, http.StatusBadRequest, model.Error{Error: "Invalid argument for request"})

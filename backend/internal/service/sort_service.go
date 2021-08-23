@@ -21,9 +21,9 @@ func NewSortService(logger *zerolog.Logger, collection *mongo.Collection) *SortS
 	}
 }
 
-func (s SortService) SortData(countries []string, industry string, sector string) (*[]model.ValidTicker, error) {
+func (s SortService) SortData(countries []string, sector string, industry string) (*[]model.ValidTicker, error) {
 
-	filter := bson.M{"locate.country": bson.M{"$in": countries}, "industry": industry, "sector": sector}
+	filter := bson.M{"locate.country": bson.M{"$in": countries}, "sector": sector, "industry": industry}
 
 	var validTickers []model.ValidTicker
 
