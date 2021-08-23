@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"github.com/rs/zerolog"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -24,14 +25,16 @@ func NewValidTickersService(logger *zerolog.Logger, cache *repository.ValidTicke
 	}
 }
 
-func (s ValidTickersService) GetValidTickers() (*[]model.ValidTicker, error) {
+func (s ValidTickersService) GetValidData() (*model.ValidData, error) {
 
-	if p, ok := s.cache.Load("valid tickers"); ok {
+	if p, ok := s.cache.Load("valid data"); ok {
 		s.logger.Info().Msg("Hit cache")
 		return &p, nil
 	}
 
+	var validData model.ValidData
 	var validTickers []model.ValidTicker
+	var validSectors []model.Sector
 
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
@@ -53,8 +56,35 @@ func (s ValidTickersService) GetValidTickers() (*[]model.ValidTicker, error) {
 		s.logger.Err(err).Send()
 	}
 
-	s.cache.Store("valid tickers", validTickers)
+	sectorsSlice, err := s.collection.Distinct(ctx, "sector", bson.M{})
+
+	if err != nil {
+		s.logger.Err(err).Send()
+	}
+
+	for _, sector := range sectorsSlice {
+		industries, err := s.collection.Distinct(ctx, "industry", bson.M{"sector": sector})
+		if err != nil {
+			s.logger.Err(err).Send()
+			break
+		}
+
+		validIndustries := make([]string, len(industries))
+		for i, v := range industries {
+			validIndustries[i] = fmt.Sprint(v)
+		}
+
+		validSectors = append(validSectors, model.Sector{
+			Sector:     sector.(string),
+			Industries: validIndustries,
+		})
+	}
+
+	validData.Tickers = validTickers
+	validData.Sectors = validSectors
+
+	s.cache.Store("valid data", validData)
 	s.logger.Info().Msg("Store to cache")
 
-	return &validTickers, err
+	return &validData, err
 }

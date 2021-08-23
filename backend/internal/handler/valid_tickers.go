@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	ValidTickersPath = "/validTickers"
+	ValidTickersPath = "/validData"
 )
 
 type ValidTickersHandler struct {
@@ -17,7 +17,7 @@ type ValidTickersHandler struct {
 }
 
 type ValidTickersService interface {
-	GetValidTickers() (*[]model.ValidTicker, error)
+	GetValidData() (*model.ValidData, error)
 }
 
 func NewValidTickersHandler(logger *zerolog.Logger, srv *service.ValidTickersService) *ValidTickersHandler {
@@ -29,18 +29,24 @@ func NewValidTickersHandler(logger *zerolog.Logger, srv *service.ValidTickersSer
 
 func (h *ValidTickersHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
-	validTickers, err := h.service.GetValidTickers()
+	validData, err := h.service.GetValidData()
 	if err != nil {
-		h.logger.Error().Err(err).Msg("GetAllData error")
+		h.logger.Error().Err(err).Msg("GetValidData error")
 		writeResponse(w, http.StatusInternalServerError, model.Error{Error: "Internal server error"})
 		return
 	}
 
-	if len(*validTickers) == 0 {
-		h.logger.Error().Err(err).Msg("GetValidTickers error")
+	if len(validData.Tickers) == 0 {
+		h.logger.Error().Err(err).Msg("GetValidData error")
 		writeResponse(w, http.StatusInternalServerError, model.Error{Error: "Valid tickers list empty"})
 		return
 	}
 
-	writeResponse(w, http.StatusOK, validTickers)
+	if len(validData.Sectors) == 0 {
+		h.logger.Error().Err(err).Msg("GetValidData error")
+		writeResponse(w, http.StatusInternalServerError, model.Error{Error: "Valid tickers list empty"})
+		return
+	}
+
+	writeResponse(w, http.StatusOK, validData)
 }

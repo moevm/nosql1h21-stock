@@ -29,11 +29,13 @@ func (s SortService) SortData(countries []string, sector string, industry string
 
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
+
 	cur, err := s.collection.Find(ctx, filter)
 	if err != nil {
 		s.logger.Err(err).Send()
 	}
 	defer cur.Close(ctx)
+
 	for cur.Next(ctx) {
 		var result model.ValidTicker
 		err := cur.Decode(&result)

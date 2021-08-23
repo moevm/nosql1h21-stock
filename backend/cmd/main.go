@@ -48,7 +48,10 @@ func main() {
 
 	validTickersRepo := repository.NewCache()
 	validTickersMap := sync.Map{}
-	GetValidTickers(collection, &logger, validTickersRepo, &validTickersMap)
+
+	if err = GetValidData(collection, &logger, validTickersRepo, &validTickersMap); err != nil {
+		logger.Fatal().Err(err).Msg("Load valid data error")
+	}
 
 	stockService := service.NewStockService(&logger, collection)
 	stockHandler := handler.NewStockHandler(&logger, stockService, &validTickersMap)

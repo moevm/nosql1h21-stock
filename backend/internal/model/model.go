@@ -109,3 +109,13 @@ type SortRequest struct {
 	Industry  string
 	Sector    string
 }
+
+type Sector struct {
+	Sector     string
+	Industries []string
+}
+
+type ValidData struct {
+	Sectors []Sector
+	Tickers []ValidTicker
+}

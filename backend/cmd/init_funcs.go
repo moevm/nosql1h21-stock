@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"github.com/rs/zerolog"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -11,8 +12,10 @@ import (
 	"time"
 )
 
-func GetValidTickers(collection *mongo.Collection, logger *zerolog.Logger, cache *repository.ValidTickerCache, tickersMap *sync.Map) error {
+func GetValidData(collection *mongo.Collection, logger *zerolog.Logger, cache *repository.ValidTickerCache, tickersMap *sync.Map) error {
+	var validData model.ValidData
 	var validTickers []model.ValidTicker
+	var validSectors []model.Sector
 
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
@@ -36,12 +39,42 @@ func GetValidTickers(collection *mongo.Collection, logger *zerolog.Logger, cache
 		return err
 	}
 
-	for _, v := range validTickers {
-		tickersMap.Store(v.Symbol, v.ShortName)
+	sectorsSlice, err := collection.Distinct(ctx, "sector", bson.M{})
+
+	if err != nil {
+		logger.Err(err).Send()
+		return err
 	}
 
-	cache.Store("valid tickers", validTickers)
-	logger.Info().Msg("Valid tickers store to cache !")
+	for _, sector := range sectorsSlice {
+		industries, err := collection.Distinct(ctx, "industry", bson.M{"sector": sector})
+		if err != nil {
+			logger.Err(err).Send()
+			return err
+		}
 
-	return nil
+		validIndustries := make([]string, len(industries))
+		for i, v := range industries {
+			validIndustries[i] = fmt.Sprint(v)
+		}
+
+		validSectors = append(validSectors, model.Sector{
+			Sector:     sector.(string),
+			Industries: validIndustries,
+		})
+	}
+
+	if err == nil {
+		validData.Tickers = validTickers
+		validData.Sectors = validSectors
+
+		for _, v := range validTickers {
+			tickersMap.Store(v.Symbol, v.ShortName)
+		}
+
+		cache.Store("valid data", validData)
+		logger.Info().Msg("Store to cache valid data")
+	}
+
+	return err
 }
