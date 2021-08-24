@@ -56,7 +56,7 @@ func main() {
 	stockService := service.NewStockService(&logger, collection)
 	stockHandler := handler.NewStockHandler(&logger, stockService, &validTickersMap)
 
-	validTickersService := service.NewValidTickersService(&logger, validTickersRepo, collection)
+	validTickersService := service.NewValidTickersService(&logger, validTickersRepo)
 	validTickersHandler := handler.NewValidTickersHandler(&logger, validTickersService)
 
 	sortService := service.NewSortService(&logger, collection)

@@ -64,9 +64,21 @@ func GetValidData(collection *mongo.Collection, logger *zerolog.Logger, cache *r
 		})
 	}
 
+	countries, err := collection.Distinct(ctx, "locate.country", bson.M{})
+	validCountries := make([]string, len(countries))
+	for i, v := range countries {
+		validCountries[i] = fmt.Sprint(v)
+	}
+
+	if err != nil {
+		logger.Err(err).Send()
+		return err
+	}
+
 	if err == nil {
 		validData.Tickers = validTickers
 		validData.Sectors = validSectors
+		validData.Countries = validCountries
 
 		for _, v := range validTickers {
 			tickersMap.Store(v.Symbol, v.ShortName)
