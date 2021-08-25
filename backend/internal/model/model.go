@@ -116,6 +116,7 @@ type Sector struct {
 }
 
 type ValidData struct {
-	Sectors []Sector
-	Tickers []ValidTicker
+	Sectors   []Sector
+	Tickers   []ValidTicker
+	Countries []string
 }
