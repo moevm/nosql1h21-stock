@@ -1,12 +1,12 @@
-import { createApp } from 'vue'
+import {createApp} from 'vue'
 import App from './App.vue'
-import { createRouter, createWebHistory } from 'vue-router'
+import {createRouter, createWebHistory} from 'vue-router'
 import Home from './views/Home';
-import Todos from './views/Todos';
+import Stock from './views/Stock';
 
 const routers = [
     {path: '/', component: Home},
-    {path: '/todos', component: Todos}
+    {name: 'stock', path: '/stock/:ticker', component: Stock}
 ];
 
 const router = createRouter({

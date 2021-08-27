@@ -1,9 +1,8 @@
 <template>
   <div id="app">
-  <h1>Todo application</h1>
+  <h1>Stock application</h1>
   <nav>
-    <router-link to="/">Home</router-link>
-    <router-link to="/todos">About</router-link>
+    <router-link to="/">Search</router-link>
   </nav>
   <hr>
   <router-view/>

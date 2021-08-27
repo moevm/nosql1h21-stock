@@ -1,27 +1,22 @@
 <template>
-  <form @submit.prevent="onSubmit">
+  <div>
     <input v-model="text">
-    <button @click="clickSearchBtn()">Search</button>
-  </form>
+  </div>
 </template>
 
 <script>
 export default {
   data() {
     return {
-      text: '',
-      fieldDisable: false
+      text: ''
     }
   },
   methods: {
-    clickSearchBtn() {
-      this.$emit('search-text', this.text)
-    },
+
   },
   watch: {
     text: function (value) {
-     // console.log('Text edited: ', value);
-     this.$emit('search-text', value)
+      this.$emit('search-text', value)
     },
   }
 }
