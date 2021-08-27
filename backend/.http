@@ -1,16 +1,16 @@
-GET http://127.0.0.1:8080/stock/AAPL
+GET http://127.0.0.1:3000/stock/AAPL
 
 ###
-GET http://127.0.0.1:8080/stock/GOOG
+GET http://127.0.0.1:3000/stock/GOOG
 
 ###
-GET http://127.0.0.1:8080/stock/IBM
+GET http://127.0.0.1:3000/stock/IBM
 
 ###
-GET http://127.0.0.1:8080/validData
+GET http://127.0.0.1:3000/validData
 
 ###
-POST http://127.0.0.1:8080/sort
+POST http://127.0.0.1:3000/sort
 
 {
     "countries": ["China","USA"],
