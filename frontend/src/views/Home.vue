@@ -1,8 +1,10 @@
 <template>
   <h2>Search page</h2>
-  <FindStock/>
+  <FindStock
+      v-on:search-text="updateSearchText"
+  />
   <StockList
-      v-bind:tickers="tickers"
+      v-bind:tickers="filteredTickers"
   />
 </template>
 
@@ -14,10 +16,31 @@ export default {
   components: {StockList, FindStock},
   data() {
     return {
+      searchText: "",
       countries: [],
       sectors: [],
       tickers: [],
       loading: true,
+    }
+  },
+  methods: {
+    updateSearchText(searchText) {
+      this.searchText = searchText
+    },
+  },
+  computed: {
+    filteredTickers() {
+      let filterTickers = []
+
+      if (this.searchText.trim() !== "") {
+        filterTickers = this.tickers.filter(t => t.Symbol === this.searchText.toUpperCase())
+
+        if (filterTickers.length === 0) {
+          filterTickers = this.tickers.filter(t => t.ShortName.toLowerCase().indexOf(this.searchText.toLowerCase()) !== -1)
+        }
+      }
+
+      return filterTickers
     }
   },
   mounted() {
