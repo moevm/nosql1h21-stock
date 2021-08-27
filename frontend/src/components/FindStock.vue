@@ -1,7 +1,7 @@
 <template>
   <form @submit.prevent="onSubmit">
     <input v-model="text">
-    <button @click="clickSearchBtn()">Edit</button>
+    <button @click="clickSearchBtn()">Search</button>
   </form>
 </template>
 
