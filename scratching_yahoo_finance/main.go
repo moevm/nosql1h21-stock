@@ -9,8 +9,8 @@ import (
 	"sync"
 	"time"
 
-	"nosql1h21-stock/scratching_yahoo_finance/processing"
 	"nosql1h21-stock/scratching_yahoo_finance/requests"
+	"nosql1h21-stock/scratching_yahoo_finance/tickers"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -62,10 +62,10 @@ type FinancialData struct {
 }
 
 func main() {
-
-	tickers := make(map[string]struct{})
-
-	processing.ProccessFiles(&tickers, "nasdaq_screener_1626544763604.csv", "constituents_csv.csv")
+	tickers, err := tickers.GetTickers()
+	if err != nil {
+		log.Fatal("GetTickers: ", err)
+	}
 
 	var invalidTickers sync.Map
 	var errorTickers sync.Map
