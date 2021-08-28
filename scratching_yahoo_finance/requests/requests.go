@@ -11,11 +11,6 @@ import (
 	"time"
 )
 
-const priceModule = "price"
-const profileModule = "assetProfile"
-const earningsModule = "earnings"
-const financialDataModule = "financialData"
-
 func getBody(ticker *string, module string, errorTickers *sync.Map) *[]byte {
 	client := http.Client{
 		Timeout: time.Duration(time.Minute),
@@ -49,7 +44,7 @@ func jsonToString(j []byte) string {
 }
 
 func GetData(ticker string, invalidTickers *sync.Map, errorTickers *sync.Map, validTickers *sync.Map) {
-	body := getBody(&ticker, setModules(priceModule, profileModule, earningsModule, financialDataModule), errorTickers)
+	body := getBody(&ticker, "price,assetProfile,earnings,financialData", errorTickers)
 
 	if body == nil {
 		return
@@ -91,12 +86,4 @@ func GetData(ticker string, invalidTickers *sync.Map, errorTickers *sync.Map, va
 	}
 
 	validTickers.Store(ticker, data.QuoteSummary.Result[0])
-}
-
-func setModules(v ...string) string {
-	modules := v[0]
-	for i := 1; i < len(v); i++ {
-		modules = modules + "," + v[i]
-	}
-	return modules
 }
