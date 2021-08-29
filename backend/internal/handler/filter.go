@@ -33,7 +33,7 @@ func NewFilterHandler(logger *zerolog.Logger, srv *service.FilterService, validT
 
 func (s *FilterHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
-	sortRequest := model.SortRequest{}
+	sortRequest := model.FilterRequest{}
 	err := json.NewDecoder(r.Body).Decode(&sortRequest)
 	if err != nil {
 		writeResponse(w, http.StatusBadRequest, model.Error{Error: "Invalid argument for request"})

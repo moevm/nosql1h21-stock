@@ -104,7 +104,7 @@ type ValidTicker struct {
 	ShortName string `bson:"short name"`
 }
 
-type SortRequest struct {
+type FilterRequest struct {
 	Countries []string
 	Industry  string
 	Sector    string
