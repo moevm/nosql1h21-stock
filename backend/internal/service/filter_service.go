@@ -9,19 +9,19 @@ import (
 	"time"
 )
 
-type SortService struct {
+type FilterService struct {
 	logger     *zerolog.Logger
 	collection *mongo.Collection
 }
 
-func NewSortService(logger *zerolog.Logger, collection *mongo.Collection) *SortService {
-	return &SortService{
+func NewFilterService(logger *zerolog.Logger, collection *mongo.Collection) *FilterService {
+	return &FilterService{
 		logger:     logger,
 		collection: collection,
 	}
 }
 
-func (s SortService) SortData(countries []string, sector string, industry string) (*[]model.ValidTicker, error) {
+func (s FilterService) FilterData(countries []string, sector string, industry string) (*[]model.ValidTicker, error) {
 
 	filter := bson.M{"locate.country": bson.M{"$in": countries}, "sector": sector, "industry": industry}
 

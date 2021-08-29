@@ -10,7 +10,7 @@ GET http://127.0.0.1:3000/stock/IBM
 GET http://127.0.0.1:3000/validData
 
 ###
-POST http://127.0.0.1:3000/sort
+POST http://127.0.0.1:3000/filter
 
 {
     "countries": ["China","USA"],

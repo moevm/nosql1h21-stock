@@ -7,19 +7,19 @@ import (
 	"nosql1h21-stock-backend/backend/internal/repository"
 )
 
-type ValidTickersService struct {
+type ValidDataService struct {
 	logger *zerolog.Logger
 	cache  *repository.ValidTickerCache
 }
 
-func NewValidTickersService(logger *zerolog.Logger, cache *repository.ValidTickerCache) *ValidTickersService {
-	return &ValidTickersService{
+func NewValidDataService(logger *zerolog.Logger, cache *repository.ValidTickerCache) *ValidDataService {
+	return &ValidDataService{
 		logger: logger,
 		cache:  cache,
 	}
 }
 
-func (s ValidTickersService) GetValidData() (*model.ValidData, error) {
+func (s ValidDataService) GetValidData() (*model.ValidData, error) {
 
 	if p, ok := s.cache.Load("valid data"); ok {
 		s.logger.Info().Msg("Hit cache")

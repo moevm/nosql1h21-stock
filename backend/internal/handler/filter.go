@@ -10,28 +10,28 @@ import (
 )
 
 const (
-	SortPath = "/sort"
+	SortPath = "/filter"
 )
 
-type SortHandler struct {
+type FilterHandler struct {
 	logger          *zerolog.Logger
-	service         SortService
+	service         FilterService
 	validTickersMap *sync.Map
 }
 
-type SortService interface {
-	SortData(countries []string, industry string, sector string) (*[]model.ValidTicker, error)
+type FilterService interface {
+	FilterData(countries []string, industry string, sector string) (*[]model.ValidTicker, error)
 }
 
-func NewSortHandler(logger *zerolog.Logger, srv *service.SortService, validTickersMap *sync.Map) *SortHandler {
-	return &SortHandler{
+func NewFilterHandler(logger *zerolog.Logger, srv *service.FilterService, validTickersMap *sync.Map) *FilterHandler {
+	return &FilterHandler{
 		logger:          logger,
 		service:         srv,
 		validTickersMap: validTickersMap,
 	}
 }
 
-func (s *SortHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (s *FilterHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	sortRequest := model.SortRequest{}
 	err := json.NewDecoder(r.Body).Decode(&sortRequest)
@@ -40,7 +40,7 @@ func (s *SortHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	validTickers, err := s.service.SortData(sortRequest.Countries, sortRequest.Sector, sortRequest.Industry)
+	validTickers, err := s.service.FilterData(sortRequest.Countries, sortRequest.Sector, sortRequest.Industry)
 
 	if err != nil {
 		writeResponse(w, http.StatusBadRequest, model.Error{Error: "Invalid argument for request"})

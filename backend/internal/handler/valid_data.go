@@ -11,23 +11,23 @@ const (
 	ValidTickersPath = "/validData"
 )
 
-type ValidTickersHandler struct {
+type ValidDataHandler struct {
 	logger  *zerolog.Logger
-	service ValidTickersService
+	service ValidDataService
 }
 
-type ValidTickersService interface {
+type ValidDataService interface {
 	GetValidData() (*model.ValidData, error)
 }
 
-func NewValidTickersHandler(logger *zerolog.Logger, srv *service.ValidTickersService) *ValidTickersHandler {
-	return &ValidTickersHandler{
+func NewValidDataHandler(logger *zerolog.Logger, srv *service.ValidDataService) *ValidDataHandler {
+	return &ValidDataHandler{
 		logger:  logger,
 		service: srv,
 	}
 }
 
-func (h *ValidTickersHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (h *ValidDataHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	validData, err := h.service.GetValidData()
 	if err != nil {
