@@ -50,9 +50,9 @@ func getTickers(filepath string, tickers map[string]struct{}) error {
 		}
 		if len(record) > 0 {
 			ticker := record[0]
-			// ticker = strings.Split(ticker, "^")[0]
-			// ticker = strings.Split(ticker, "/")[0]
-			// ticker = strings.Trim(ticker, " \n") // TODO Is it useful?
+			ticker = strings.Split(ticker, "^")[0]
+			ticker = strings.Split(ticker, "/")[0]
+			ticker = strings.TrimSpace(ticker)
 			tickers[ticker] = struct{}{}
 		}
 	}
