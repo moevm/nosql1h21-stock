@@ -3,102 +3,113 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"os/signal"
-	"sync"
-	"syscall"
 	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
-	"github.com/rs/zerolog"
+	"github.com/go-chi/cors"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 
 	"nosql1h21-stock-backend/backend/internal/config"
 	"nosql1h21-stock-backend/backend/internal/handler"
-	"nosql1h21-stock-backend/backend/internal/repository"
 	"nosql1h21-stock-backend/backend/internal/service"
 )
 
-func main() {
-	logger := zerolog.New(os.Stdout).With().Timestamp().Logger()
+func connectionsClosedForServer(server *http.Server) chan struct{} {
+	connectionsClosed := make(chan struct{})
+	go func() {
+		shutdown := make(chan os.Signal, 1)
+		signal.Notify(shutdown, os.Interrupt)
+		defer signal.Stop(shutdown)
+		<-shutdown
 
+		ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
+		defer cancel()
+		log.Println("Closing connections")
+		if err := server.Shutdown(ctx); err != nil {
+			log.Println(err)
+		}
+		close(connectionsClosed)
+	}()
+	return connectionsClosed
+}
+
+func connectMongo(dbConn string) (_ *mongo.Client, disconnect func(), _ error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(dbConn))
+	if err != nil {
+		return nil, nil, err
+	}
+
+	ctx, cancel = context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	err = client.Ping(ctx, readpref.Primary())
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return client, func() {
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		client.Disconnect(ctx)
+	}, nil
+}
+
+type Handler interface {
+	Method() string
+	Path() string
+	ServeHTTP(w http.ResponseWriter, r *http.Request)
+}
+
+func registerHandler(router chi.Router, handler Handler) {
+	router.Method(handler.Method(), handler.Path(), handler)
+}
+
+func main() {
 	cfg, err := config.New()
 	if err != nil {
-		logger.Fatal().Err(err).Msg("Configuration error")
+		log.Fatal(err)
 	}
 
-	r := chi.NewRouter()
+	router := chi.NewRouter()
+	router.Use(middleware.RequestID)
+	router.Use(middleware.Logger)
+	router.Use(middleware.Recoverer)
+	router.Use(cors.AllowAll().Handler) // TODO Test if it works
 
-	mongoConnectCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	mongoClient, err := mongo.Connect(mongoConnectCtx, options.Client().ApplyURI(cfg.DBConnString))
+	mongoClient, disconnect, err := connectMongo(cfg.DBConn)
 	if err != nil {
-		logger.Fatal().Err(err).Msg("MongoDB connection error")
+		log.Fatal(err)
 	}
-	defer mongoClient.Disconnect(mongoConnectCtx)
-	if err := mongoClient.Ping(mongoConnectCtx, readpref.Primary()); err != nil {
-		logger.Fatal().Err(err).Msg("MongoDB pinging error")
-	}
-	logger.Info().Msg("MongoDB is successfully connected and pinged.")
+	defer disconnect()
 
-	collection := mongoClient.Database("stock_market").Collection("stocks")
+	service := service.NewService(mongoClient)
 
-	validTickersRepo := repository.NewCache()
-	validTickersMap := sync.Map{}
+	registerHandler(router, &handler.StockHandler{Service: service})
+	registerHandler(router, &handler.SearchByTickerHandler{Service: service})
+	registerHandler(router, &handler.SearchByNameHandler{Service: service})
+	registerHandler(router, &handler.CountriesHandler{Service: service})
+	registerHandler(router, &handler.SectorsHandler{Service: service})
+	registerHandler(router, &handler.IndustriesHandler{Service: service})
+	registerHandler(router, &handler.FilterHandler{Service: service})
 
-	if err = GetValidData(collection, &logger, validTickersRepo, &validTickersMap); err != nil {
-		logger.Fatal().Err(err).Msg("Load valid data error")
-	}
-
-	stockService := service.NewStockService(&logger, collection)
-	stockHandler := handler.NewStockHandler(&logger, stockService, &validTickersMap)
-
-	validTickersService := service.NewValidTickersService(&logger, validTickersRepo)
-	validTickersHandler := handler.NewValidTickersHandler(&logger, validTickersService)
-
-	sortService := service.NewSortService(&logger, collection)
-	sortHandler := handler.NewSortHandler(&logger, sortService, &validTickersMap)
-
-	r.Route("/", func(r chi.Router) {
-		r.Use(middleware.RequestLogger(&handler.LogFormatter{Logger: &logger}))
-		r.Use(middleware.Recoverer)
-		r.Method(http.MethodGet, handler.StockPath, stockHandler)
-		r.Method(http.MethodGet, handler.ValidTickersPath, validTickersHandler)
-		r.Method(http.MethodPost, handler.SortPath, sortHandler)
-	})
-
-	srv := http.Server{
-		Addr:    fmt.Sprintf(":%d", cfg.Port),
-		Handler: r,
+	addr := fmt.Sprintf(":%d", cfg.Port)
+	server := http.Server{
+		Addr:    addr,
+		Handler: router,
 	}
 
-	shutdown := make(chan os.Signal, 1)
-	signal.Notify(shutdown, os.Interrupt, syscall.SIGTERM)
-	defer signal.Stop(shutdown)
-
-	go func() {
-		logger.Info().Msgf("Server is listening on :%d", cfg.Port)
-		err := srv.ListenAndServe()
-		if err != nil && err != http.ErrServerClosed {
-			logger.Fatal().Err(err).Msg("Server error")
-		}
-	}()
-
-	<-shutdown
-
-	logger.Info().Msg("Shutdown signal received")
-
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
-	defer func() {
-		cancel()
-	}()
-
-	if err := srv.Shutdown(ctx); err != nil {
-		logger.Fatal().Err(err).Msg("Server shutdown error")
+	connectionsClosed := connectionsClosedForServer(&server)
+	log.Println("Server is listening on " + addr)
+	if err := server.ListenAndServe(); err != http.ErrServerClosed {
+		log.Println(err)
 	}
-
-	logger.Info().Msg("Server stopped gracefully")
+	<-connectionsClosed
 }

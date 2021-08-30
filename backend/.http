@@ -4,16 +4,31 @@ GET http://127.0.0.1:3000/stock/AAPL
 GET http://127.0.0.1:3000/stock/GOOG
 
 ###
-GET http://127.0.0.1:3000/stock/IBM
+GET http://127.0.0.1:3000/search-by-ticker/GO
 
 ###
-GET http://127.0.0.1:3000/validData
+GET http://127.0.0.1:3000/search-by-name/Apple
 
 ###
-POST http://127.0.0.1:3000/sort
+GET http://127.0.0.1:3000/countries
 
-{
-    "countries": ["China","USA"],
-    "industry": "Internet Retail",
-    "sector": "Consumer Cyclical"
-}
+###
+GET http://127.0.0.1:3000/sectors
+
+###
+GET http://127.0.0.1:3000/industries-in-sector/Energy
+
+###
+GET http://127.0.0.1:3000/industries-in-sector/Communication Services
+
+### All stocks
+GET http://127.0.0.1:3000/filter
+
+###
+GET http://127.0.0.1:3000/filter?countries=Bermuda,Switzerland
+
+###
+GET http://127.0.0.1:3000/filter?sector=Communication Services&industry=Telecom Services
+
+###
+GET http://127.0.0.1:3000/filter?sector=Consumer Cyclical&industry=Internet Retail&countries=United States
