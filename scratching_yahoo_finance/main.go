@@ -45,8 +45,7 @@ func main() {
 				companyInfo.Earnings == nil ||
 				companyInfo.FinancialData == nil ||
 				companyInfo.FinancialData.TotalCash == 0 ||
-				companyInfo.Earnings.FinancialCurrency == "" ||
-				len(companyInfo.Earnings.FinancialsChart.Quarterly) == 0 // TODO? What if the company is very young?
+				companyInfo.Earnings.FinancialCurrency == ""
 			if incompleteInfo {
 				log.Printf("Company with ticker %v excluded because of incomplete info\n", ticker)
 				return
