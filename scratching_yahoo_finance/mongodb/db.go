@@ -35,6 +35,10 @@ func Connect() (_ *mongo.Client, disconnect func(), _ error) {
 func SaveCompaniesInfo(client *mongo.Client, companiesInfo map[string]*yahoo.CompanyInfo) error {
 	collection := client.Database("stock_market").Collection("stocks")
 
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	collection.Drop(ctx)
+
 	documents := []interface{}{}
 
 	for ticker, info := range companiesInfo {
@@ -104,7 +108,7 @@ func SaveCompaniesInfo(client *mongo.Client, companiesInfo map[string]*yahoo.Com
 		documents = append(documents, document)
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
+	ctx, cancel = context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
 	_, err := collection.InsertMany(ctx, documents)
 	return err
