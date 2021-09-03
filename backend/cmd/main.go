@@ -72,6 +72,14 @@ func registerHandler(router chi.Router, handler Handler) {
 	router.Method(handler.Method(), handler.Path(), handler)
 }
 
+func cacheMiddleware(next http.Handler) http.Handler {
+	fn := func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Cache-Control", "max-age=3600") // Caching for 1 hour
+		next.ServeHTTP(w, r)
+	}
+	return http.HandlerFunc(fn)
+}
+
 func main() {
 	cfg, err := config.New()
 	if err != nil {
@@ -92,13 +100,16 @@ func main() {
 
 	service := service.NewService(mongoClient)
 
-	registerHandler(router, &handler.StockHandler{Service: service})
-	registerHandler(router, &handler.SearchByTickerHandler{Service: service})
-	registerHandler(router, &handler.SearchByNameHandler{Service: service})
-	registerHandler(router, &handler.CountriesHandler{Service: service})
-	registerHandler(router, &handler.SectorsHandler{Service: service})
-	registerHandler(router, &handler.IndustriesHandler{Service: service})
-	registerHandler(router, &handler.FilterHandler{Service: service})
+	router.Group(func(router chi.Router) {
+		router.Use(cacheMiddleware)
+		registerHandler(router, &handler.StockHandler{Service: service})
+		registerHandler(router, &handler.SearchByTickerHandler{Service: service})
+		registerHandler(router, &handler.SearchByNameHandler{Service: service})
+		registerHandler(router, &handler.CountriesHandler{Service: service})
+		registerHandler(router, &handler.SectorsHandler{Service: service})
+		registerHandler(router, &handler.IndustriesHandler{Service: service})
+		registerHandler(router, &handler.FilterHandler{Service: service})
+	})
 
 	addr := fmt.Sprintf(":%d", cfg.Port)
 	server := http.Server{
