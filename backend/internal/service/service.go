@@ -114,3 +114,34 @@ func (s *Service) Filter(ctx context.Context, countries []string, sector, indust
 	}
 	return s.findStocks(ctx, filter)
 }
+
+type SearchRequest struct {
+	Fragment  string // in ticker or company name
+	Sector    string
+	Industry  string
+	Countries []string
+}
+
+func (s *Service) Search(ctx context.Context, r SearchRequest) (stocks []model.StockOverview, _ error) {
+	filter := bson.M{}
+	if r.Countries != nil {
+		filter["locate.country"] = bson.M{"$in": r.Countries}
+	}
+	if r.Sector != "" {
+		filter["sector"] = r.Sector
+	}
+	if r.Industry != "" {
+		filter["industry"] = r.Industry
+	}
+	if r.Fragment != "" {
+		filter["$or"] = bson.A{
+			bson.M{
+				"symbol": bson.M{"$regex": r.Fragment, "$options": "i"},
+			},
+			bson.M{
+				"long name": bson.M{"$regex": r.Fragment, "$options": "i"},
+			},
+		}
+	}
+	return s.findStocks(ctx, filter)
+}

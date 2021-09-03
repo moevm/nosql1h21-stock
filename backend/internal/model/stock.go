@@ -3,6 +3,11 @@ package model
 type StockOverview struct {
 	Symbol    string
 	ShortName string `bson:"short name,omitempty"`
+	Industry  string `bson:"industry,omitempty"`
+	Sector    string `bson:"sector,omitempty"`
+	Locate    struct {
+		Country string `bson:"country,omitempty"`
+	}
 }
 
 type Stock struct {

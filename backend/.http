@@ -35,3 +35,9 @@ GET http://127.0.0.1:3000/filter?sector=Communication Services&industry=Telecom 
 
 ###
 GET http://127.0.0.1:3000/filter?sector=Consumer Cyclical&industry=Internet Retail&countries=United States
+
+###
+GET http://127.0.0.1:3000/search?countries=Russia
+
+###
+GET http://127.0.0.1:3000/search?fragment=apple&sector=Real Estate

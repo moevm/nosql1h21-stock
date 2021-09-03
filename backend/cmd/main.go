@@ -109,6 +109,7 @@ func main() {
 		registerHandler(router, &handler.SectorsHandler{Service: service})
 		registerHandler(router, &handler.IndustriesHandler{Service: service})
 		registerHandler(router, &handler.FilterHandler{Service: service})
+		registerHandler(router, &handler.SearchHandler{Service: service})
 	})
 
 	addr := fmt.Sprintf(":%d", cfg.Port)
