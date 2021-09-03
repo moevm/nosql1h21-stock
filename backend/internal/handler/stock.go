@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"nosql1h21-stock-backend/backend/internal/model"
 	"nosql1h21-stock-backend/backend/internal/service"
+	"reflect"
+	"strings"
 
 	"github.com/go-chi/chi/v5"
 )
@@ -40,5 +42,17 @@ func (h *StockHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	writeResponse(w, r, stock)
+	var resp interface{} = stock
+	if fields := r.FormValue("fields"); fields != "" {
+		// Using reflection to leave in the response only requested fields
+
+		m := make(map[string]interface{})
+		rv := reflect.ValueOf(*stock)
+		for _, field := range strings.Split(fields, ",") {
+			m[field] = rv.FieldByName(field).Interface()
+		}
+		resp = m
+	}
+
+	writeResponse(w, r, resp)
 }
