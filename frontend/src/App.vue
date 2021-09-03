@@ -5,17 +5,22 @@
     <router-link to="/">Search</router-link>
   </nav>
   <hr>
-  <router-view/>
+  
+  <!-- Magic, https://stackoverflow.com/a/67682535/13828753 -->
+  <router-view v-slot="{ Component }">
+    <keep-alive>
+      <component :is="Component" />
+    </keep-alive>
+  </router-view>
   </div>
 </template>
 
 <style scoped>
 #app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  font-family: sans-serif;
   text-align: center;
-  color: #2c3e50;
+  --color: #222;
+  color: var(--color);
   margin-top: 60px;
 }
 </style>

@@ -1,59 +1,62 @@
 <template>
   <h2>Search page</h2>
-  <FindStock
-      v-on:search-text="updateSearchText"
-  />
-  <StockList
-      v-bind:tickers="filteredTickers"
-  />
+  <input v-model.trim="searchText">
+  <div class="results">Results: {{stocks.length}}</div>
+  <Spinner v-if="pending"/>
+  <div v-else class="stock" v-for="stock of stocks" :key="stock.Symbol" @click="this.$router.push('/stock/' + stock.Symbol)">
+    <div>{{stock.Symbol}}</div>
+    <div class="pusher" />
+    <div>{{stock.ShortName}}</div>
+  </div>
 </template>
 
 <script>
-import FindStock from "@/components/FindStock";
-import StockList from "@/components/StockList";
+import Spinner from "@/components/Spinner";
 
 export default {
-  components: {StockList, FindStock},
+  components: {Spinner },
   data() {
     return {
       searchText: "",
-      countries: [],
-      sectors: [],
-      tickers: [],
-      loading: true,
+      pending: 0,
+      stocks: [],
     }
   },
-  methods: {
-    updateSearchText(searchText) {
-      this.searchText = searchText
-    },
-  },
-  computed: {
-    filteredTickers() {
-      let filterTickers = []
-
-      if (this.searchText.trim() !== "") {
-        filterTickers = this.tickers.filter(t => t.Symbol === this.searchText.toUpperCase())
-
-        if (filterTickers.length === 0) {
-          filterTickers = this.tickers.filter(t => t.ShortName.toLowerCase().indexOf(this.searchText.toLowerCase()) !== -1)
-        }
+  watch: {
+    searchText(searchText) {
+      if (searchText === "") {
+        this.stocks = []
+        return
       }
-
-      return filterTickers
+      searchText = searchText.toUpperCase()
+      this.pending++
+      fetch('http://127.0.0.1:3000/search-by-ticker/' + searchText)
+      .then(response => response.json())
+      .then(stocks => {
+        this.stocks = stocks
+      })
+      .finally(() => this.pending--)
     }
-  },
-  mounted() {
-    fetch('http://127.0.0.1:3000/validData')
-        .then(response => response.json())
-        .then(json => {
-          setTimeout(() => {
-            this.countries = json.Countries
-            this.sectors = json.Sectors
-            this.tickers = json.Tickers
-            this.loading = false
-          }, 1000)
-        })
   }
 }
 </script>
+
+<style scoped>
+  .stock {
+    width: 600px;
+    margin: 0 auto;
+    padding: 4px 0;
+    border-top: 1px solid #ccc;
+    display: flex;
+  }
+  .stock:hover {
+    cursor: pointer;
+    background-color: #f5f5f5;
+  }
+  .results {
+    padding: 5px 0;
+  }
+  .pusher {
+    flex-grow: 1;
+  }
+</style>

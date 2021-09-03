@@ -4,14 +4,14 @@ import {createRouter, createWebHistory} from 'vue-router'
 import Home from './views/Home';
 import Stock from './views/Stock';
 
-const routers = [
+const routes = [
     {path: '/', component: Home},
     {name: 'stock', path: '/stock/:ticker', component: Stock}
 ];
 
 const router = createRouter({
     history: createWebHistory(''),
-    routes: routers,
+    routes: routes,
 })
 
 createApp(App).use(router).mount('#app')
