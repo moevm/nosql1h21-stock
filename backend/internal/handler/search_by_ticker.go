@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"net/http"
+	"nosql1h21-stock-backend/backend/internal/model"
 
 	"github.com/go-chi/chi/v5"
 )
@@ -12,7 +13,7 @@ type SearchByTickerHandler struct {
 }
 
 type SearchByTickerService interface {
-	SearchByTicker(ctx context.Context, tickerFragment string) (tickers []string, _ error)
+	SearchByTicker(ctx context.Context, tickerFragment string) (stocks []model.StockOverview, _ error)
 }
 
 func (h *SearchByTickerHandler) Method() string {
@@ -26,12 +27,12 @@ func (h *SearchByTickerHandler) Path() string {
 func (h *SearchByTickerHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	tickerFragment := chi.URLParam(r, "tickerFragment")
 
-	tickers, err := h.Service.SearchByTicker(r.Context(), tickerFragment)
+	stocks, err := h.Service.SearchByTicker(r.Context(), tickerFragment)
 
 	if err != nil {
 		writeResponse(w, r, err)
 		return
 	}
 
-	writeResponse(w, r, tickers)
+	writeResponse(w, r, stocks)
 }

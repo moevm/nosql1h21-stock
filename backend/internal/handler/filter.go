@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"net/http"
+	"nosql1h21-stock-backend/backend/internal/model"
 	"strings"
 )
 
@@ -11,7 +12,7 @@ type FilterHandler struct {
 }
 
 type FilterService interface {
-	Filter(ctx context.Context, countries []string, sector, industry string) (tickers []string, _ error)
+	Filter(ctx context.Context, countries []string, sector, industry string) (stocks []model.StockOverview, _ error)
 }
 
 func (h *FilterHandler) Method() string {
@@ -31,12 +32,12 @@ func (h *FilterHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	sector := r.FormValue("sector")
 	industry := r.FormValue("industry")
 
-	tickers, err := h.Service.Filter(r.Context(), countries, sector, industry)
+	stocks, err := h.Service.Filter(r.Context(), countries, sector, industry)
 
 	if err != nil {
 		writeResponse(w, r, err)
 		return
 	}
 
-	writeResponse(w, r, tickers)
+	writeResponse(w, r, stocks)
 }

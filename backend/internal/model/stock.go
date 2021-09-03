@@ -1,5 +1,10 @@
 package model
 
+type StockOverview struct {
+	Symbol    string
+	ShortName string `bson:"short name,omitempty"`
+}
+
 type Stock struct {
 	Symbol        string `bson:"symbol"`
 	ShortName     string `bson:"short name,omitempty"`

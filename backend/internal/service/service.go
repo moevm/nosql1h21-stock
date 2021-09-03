@@ -42,38 +42,36 @@ func (s *Service) GetStockInfo(ctx context.Context, ticker string) (*model.Stock
 	return stock, nil
 }
 
-func (s *Service) findTickers(ctx context.Context, filter interface{}) (tickers []string, _ error) {
+func (s *Service) findStocks(ctx context.Context, filter interface{}) (stocks []model.StockOverview, _ error) {
 	cur, err := s.collection.Find(ctx, filter)
 	if err != nil {
 		return nil, err
 	}
 	defer cur.Close(ctx)
 
-	tickers = []string{}
+	stocks = []model.StockOverview{}
 	for cur.Next(ctx) {
-		var result struct {
-			Symbol string
-		}
-		err := cur.Decode(&result)
+		var stock model.StockOverview
+		err := cur.Decode(&stock)
 		if err != nil {
 			return nil, err
 		}
-		tickers = append(tickers, result.Symbol)
+		stocks = append(stocks, stock)
 	}
 	if err := cur.Err(); err != nil {
 		return nil, err
 	}
-	return tickers, nil
+	return stocks, nil
 }
 
-func (s *Service) SearchByTicker(ctx context.Context, tickerFragment string) (tickers []string, _ error) {
-	return s.findTickers(ctx, bson.M{
+func (s *Service) SearchByTicker(ctx context.Context, tickerFragment string) (stocks []model.StockOverview, _ error) {
+	return s.findStocks(ctx, bson.M{
 		"symbol": bson.M{"$regex": tickerFragment},
 	})
 }
 
-func (s *Service) SearchByName(ctx context.Context, nameFragment string) (tickers []string, _ error) {
-	return s.findTickers(ctx, bson.M{
+func (s *Service) SearchByName(ctx context.Context, nameFragment string) (stocks []model.StockOverview, _ error) {
+	return s.findStocks(ctx, bson.M{
 		"long name": bson.M{"$regex": nameFragment},
 	})
 }
@@ -103,7 +101,7 @@ func (s *Service) GetIndustries(ctx context.Context, sector string) (industries 
 	return s.getDistinct(ctx, "industry", bson.M{"sector": sector})
 }
 
-func (s *Service) Filter(ctx context.Context, countries []string, sector, industry string) (tickers []string, _ error) {
+func (s *Service) Filter(ctx context.Context, countries []string, sector, industry string) (stocks []model.StockOverview, _ error) {
 	filter := bson.M{}
 	if countries != nil {
 		filter["locate.country"] = bson.M{"$in": countries}
@@ -114,5 +112,5 @@ func (s *Service) Filter(ctx context.Context, countries []string, sector, indust
 	if industry != "" {
 		filter["industry"] = industry
 	}
-	return s.findTickers(ctx, filter)
+	return s.findStocks(ctx, filter)
 }
