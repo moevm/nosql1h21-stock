@@ -1,10 +1,7 @@
 <template>
   <h2>Search page</h2>
   <input v-model.trim="fragment">
-  <label><input type="checkbox" v-model="selectCountries" />Select countries</label>
-  <select :disabled="!selectCountries" v-model="countries" multiple>
-    <option v-for="country in allCountries" :value="country" :key="country">{{ country }}</option>
-  </select>
+  <CountriesSelector @update:countries="countries = $event"/>
   <div class="results">Results: {{stocks.length}}</div>
   <Spinner v-if="pending"/>
   <div v-else class="stock" v-for="stock of stocks" :key="stock.Symbol" @click="this.$router.push('/stock/' + stock.Symbol)">
@@ -16,15 +13,14 @@
 
 <script>
 import Spinner from "@/components/Spinner";
+import CountriesSelector from "@/components/CountriesSelector";
 
 export default {
-  components: {Spinner },
+  components: {Spinner, CountriesSelector},
   data() {
     return {
       fragment: "",
-      allCountries: [],
       countries: [],
-      selectCountries: false,
       pending: 0,
       stocks: [],
     }
@@ -35,7 +31,7 @@ export default {
       this.pending++
       let url = "http://127.0.0.1:3000/search?" + [
         "fragment=" + this.fragment,
-        "countries=" + (this.selectCountries ? this.countries.join() : "")
+        "countries=" + this.countries.join()
       ].join("&")
       fetch(url)
       .then(response => response.json())
@@ -52,27 +48,11 @@ export default {
     countries() {
       this.update()
     }
-  },
-  created() {
-    this.pending++
-    fetch('http://127.0.0.1:3000/countries')
-    .then(response => response.json())
-    .then(countries => {
-      this.allCountries = countries
-    })
-    .finally(() => this.pending--)
   }
 }
 </script>
 
 <style scoped>
-  label {
-    display: block;
-    margin: 0 auto;
-  }
-  select {
-    height: 300px;
-  }
   .stock {
     width: 600px;
     margin: 0 auto;
