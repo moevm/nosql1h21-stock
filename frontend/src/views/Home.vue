@@ -2,6 +2,7 @@
   <h2>Search page</h2>
   <input v-model.trim="fragment">
   <CountriesSelector @update:countries="countries = $event"/>
+  <SectorIndustrySelector @update:sector="sector = $event" />
   <div class="results">Results: {{stocks.length}}</div>
   <Spinner v-if="pending"/>
   <div v-else class="stock" v-for="stock of stocks" :key="stock.Symbol" @click="this.$router.push('/stock/' + stock.Symbol)">
@@ -14,13 +15,15 @@
 <script>
 import Spinner from "@/components/Spinner";
 import CountriesSelector from "@/components/CountriesSelector";
+import SectorIndustrySelector from "@/components/SectorIndustrySelector";
 
 export default {
-  components: {Spinner, CountriesSelector},
+  components: {Spinner, CountriesSelector, SectorIndustrySelector},
   data() {
     return {
       fragment: "",
       countries: [],
+      sector: "",
       pending: 0,
       stocks: [],
     }
@@ -31,7 +34,8 @@ export default {
       this.pending++
       let url = "http://127.0.0.1:3000/search?" + [
         "fragment=" + this.fragment,
-        "countries=" + this.countries.join()
+        "countries=" + this.countries.join(),
+        "sector=" + this.sector,
       ].join("&")
       fetch(url)
       .then(response => response.json())
@@ -46,6 +50,9 @@ export default {
       this.update()
     },
     countries() {
+      this.update()
+    },
+    sector() {
       this.update()
     }
   }
