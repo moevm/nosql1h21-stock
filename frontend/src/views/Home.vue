@@ -18,6 +18,7 @@ import CountriesSelector from "@/components/CountriesSelector";
 import SectorIndustrySelector from "@/components/SectorIndustrySelector";
 
 export default {
+  name: "Home",
   components: {Spinner, CountriesSelector, SectorIndustrySelector},
   data() {
     return {

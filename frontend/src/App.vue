@@ -5,10 +5,10 @@
     <router-link to="/">Search</router-link>
   </nav>
   <hr>
-  
+
   <!-- Magic, https://stackoverflow.com/a/67682535/13828753 -->
   <router-view v-slot="{ Component }">
-    <keep-alive>
+    <keep-alive include="Home">
       <component :is="Component" />
     </keep-alive>
   </router-view>
