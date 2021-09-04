@@ -2,6 +2,7 @@
   <h2>Stock</h2>
   <Spinner v-if="!stock"/>
   <div v-else class="stock">
+    <button @click="addToCompare">Add to compare</button>
     <p>Ticker: {{ stock.Symbol }}</p>
     <p>Name: {{ stock.ShortName }}</p>
     <p>Sector: {{ stock.Sector }}</p>
@@ -43,7 +44,6 @@
       </template>
     </div>
   </div>
-  <button @click="addToCompare">Add to compare</button>
 </template>
 
 <script>
