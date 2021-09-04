@@ -19,6 +19,29 @@
     <p>Debt to equity: {{stock.FinancialData.DebtToEquity}}</p>
     <p>Return on assets: {{stock.FinancialData.ReturnOnAssets}}</p>
     <p>Return on equity: {{stock.FinancialData.ReturnOnEquity}}</p>
+    <p>Revenue and earnings: 
+      <select v-model="earningsMode">
+        <option>Yearly</option>
+        <option>Quarterly</option>
+      </select>
+    </p>
+    <div class="earningsStat">
+      <template v-for="item in stock.Earnings[earningsMode]" :key="item.Date">
+        <div class="date">
+          <div class="date-label">{{item.Date}}</div>
+          <div class="items">
+            <div class="item">
+              <div class="revenue" :style="{width: (item.Revenue / maxEarning * 300) + 'px'}" />
+              <div>{{item.Revenue}} {{stock.Earnings.FinancialCurrency}}</div>
+            </div>
+            <div class="item">
+              <div :class="{earnings: true, negative: item.Earnings < 0}" :style="{width: (Math.abs(item.Earnings) / maxEarning * 300) + 'px'}" />
+              <div>{{item.Earnings}} {{stock.Earnings.FinancialCurrency}}</div>
+            </div>
+          </div>
+        </div>
+      </template>
+    </div>
   </div>
 </template>
 
@@ -30,6 +53,7 @@ export default {
   data() {
     return {
       stock: null,
+      earningsMode: "Yearly",
     }
   },
   created() {
@@ -39,6 +63,44 @@ export default {
     .then(stock => {
         this.stock = stock
     })
-  }
+  },
+  computed: {
+    maxEarning() {
+      let max = 0
+      for (let item of this.stock.Earnings[this.earningsMode]) {
+        max = Math.max(max, item.Revenue, item.Earnings)
+      }
+      return max
+    },
+  },
 }
 </script>
+
+<style scoped>
+  .stock {
+    margin: 0 auto;
+    max-width: 600px;
+  }
+  .date, .item {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .earningsStat {
+    display: flex;
+    flex-direction: column;
+    margin: 0 auto;
+  }
+  .revenue, .earnings {
+    display: inline-block;
+    height: 10px;
+    background-color: green;
+  }
+  .items {
+    display: flex;
+    flex-direction: column;
+  }
+  .negative {
+    background-color: red;
+  }
+</style>
