@@ -2,7 +2,7 @@
   <h2>Search page</h2>
   <input v-model.trim="fragment">
   <CountriesSelector @update:countries="countries = $event"/>
-  <SectorIndustrySelector @update:sector="sector = $event" />
+  <SectorIndustrySelector @update:sector="sector = $event" @update:industry="industry = $event" />
   <div class="results">Results: {{stocks.length}}</div>
   <Spinner v-if="pending"/>
   <div v-else class="stock" v-for="stock of stocks" :key="stock.Symbol" @click="this.$router.push('/stock/' + stock.Symbol)">
@@ -24,6 +24,7 @@ export default {
       fragment: "",
       countries: [],
       sector: "",
+      industry: "",
       pending: 0,
       stocks: [],
     }
@@ -35,7 +36,8 @@ export default {
       let url = "http://127.0.0.1:3000/search?" + [
         "fragment=" + this.fragment,
         "countries=" + this.countries.join(),
-        "sector=" + this.sector,
+        "sector=" + encodeURIComponent(this.sector),
+        "industry=" + encodeURIComponent(this.industry),
       ].join("&")
       fetch(url)
       .then(response => response.json())
@@ -54,7 +56,10 @@ export default {
     },
     sector() {
       this.update()
-    }
+    },
+    industry() {
+      this.update()
+    },
   }
 }
 </script>
