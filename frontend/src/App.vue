@@ -2,7 +2,8 @@
   <div id="app">
   <h1>Stock application</h1>
   <nav>
-    <router-link to="/">Search</router-link>
+    <div><router-link to="/">Search</router-link></div>
+    <div><router-link to="/comparator">Compare</router-link></div>
   </nav>
   <hr>
 

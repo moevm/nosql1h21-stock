@@ -43,10 +43,12 @@
       </template>
     </div>
   </div>
+  <button @click="addToCompare">Add to compare</button>
 </template>
 
 <script>
 import Spinner from "@/components/Spinner";
+import {addToCompare} from "../to_compare";
 
 export default {
   components: {Spinner},
@@ -71,6 +73,11 @@ export default {
         max = Math.max(max, item.Revenue, Math.abs(item.Earnings))
       }
       return max
+    },
+  },
+  methods: {
+    addToCompare() {
+      addToCompare(this.stock)
     },
   },
 }
