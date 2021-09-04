@@ -68,7 +68,7 @@ export default {
     maxEarning() {
       let max = 0
       for (let item of this.stock.Earnings[this.earningsMode]) {
-        max = Math.max(max, item.Revenue, item.Earnings)
+        max = Math.max(max, item.Revenue, Math.abs(item.Earnings))
       }
       return max
     },
