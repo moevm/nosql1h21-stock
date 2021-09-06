@@ -5,8 +5,17 @@ services:
     build: frontend/.
     ports:
     - "8080:80"
+    depends_on:
+    - api
 
-  mongo:
+  api:
+    build: backend/.
+    ports:
+    - "3000:3000"
+    depends_on:
+    - db
+    environment:
+      DB_CONN: mongodb://db
+
+  db:
     image: mongo
-
-  # TODO
