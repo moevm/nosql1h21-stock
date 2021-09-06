@@ -13,9 +13,9 @@ type Service struct {
 	collection *mongo.Collection
 }
 
-func NewService(mongoClient *mongo.Client) *Service {
+func NewService(collection *mongo.Collection) *Service {
 	return &Service{
-		collection: mongoClient.Database("stock_market").Collection("stocks"),
+		collection: collection,
 	}
 }
 

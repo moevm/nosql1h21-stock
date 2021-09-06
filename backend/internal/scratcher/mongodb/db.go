@@ -2,39 +2,14 @@ package mongodb
 
 import (
 	"context"
-	"nosql1h21-stock/scratching_yahoo_finance/yahoo"
 	"time"
 
+	"nosql1h21-stock-backend/backend/internal/scratcher/yahoo"
+
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
-	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
-func Connect() (_ *mongo.Client, disconnect func(), _ error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://localhost:27017"))
-	if err != nil {
-		return nil, nil, err
-	}
-
-	ctx, cancel = context.WithTimeout(context.Background(), 2*time.Second)
-	defer cancel()
-	err = client.Ping(ctx, readpref.Primary())
-	if err != nil {
-		return nil, nil, err
-	}
-
-	return client, func() {
-		ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
-		defer cancel()
-		client.Disconnect(ctx)
-	}, nil
-}
-
-func SaveCompaniesInfo(client *mongo.Client, companiesInfo map[string]*yahoo.CompanyInfo) error {
-	collection := client.Database("stock_market").Collection("stocks")
-
+func SaveCompaniesInfo(collection *mongo.Collection, companiesInfo map[string]*yahoo.CompanyInfo) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	collection.Drop(ctx)

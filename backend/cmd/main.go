@@ -18,6 +18,7 @@ import (
 
 	"nosql1h21-stock-backend/backend/internal/config"
 	"nosql1h21-stock-backend/backend/internal/handler"
+	"nosql1h21-stock-backend/backend/internal/scratcher"
 	"nosql1h21-stock-backend/backend/internal/service"
 )
 
@@ -52,7 +53,7 @@ func connectMongo(dbConn string) (_ *mongo.Client, disconnect func(), _ error) {
 	defer cancel()
 	err = client.Ping(ctx, readpref.Primary())
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, fmt.Errorf("cannot ping database: %w", err)
 	}
 
 	return client, func() {
@@ -86,19 +87,25 @@ func main() {
 		log.Fatal(err)
 	}
 
-	router := chi.NewRouter()
-	router.Use(middleware.RequestID)
-	router.Use(middleware.Logger)
-	router.Use(middleware.Recoverer)
-	router.Use(cors.AllowAll().Handler) // TODO Test if it works
-
-	mongoClient, disconnect, err := connectMongo(cfg.DBConn)
+	client, disconnect, err := connectMongo(cfg.DBConn)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer disconnect()
 
-	service := service.NewService(mongoClient)
+	collection := client.Database("stock_market").Collection("stocks")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Minute)
+	defer cancel()
+	scratcher.Scratch(ctx, collection)
+
+	service := service.NewService(collection)
+
+	router := chi.NewRouter()
+	router.Use(middleware.RequestID)
+	router.Use(middleware.Logger)
+	router.Use(middleware.Recoverer)
+	router.Use(cors.AllowAll().Handler)
 
 	router.Group(func(router chi.Router) {
 		router.Use(cacheMiddleware)

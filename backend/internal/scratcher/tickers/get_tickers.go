@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-const directory = "screener_files/"
+const directory = "internal/scratcher/screener_files/"
 
 func GetTickers() (map[string]struct{}, error) {
 	entries, err := os.ReadDir(directory)

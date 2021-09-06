@@ -1,16 +1,28 @@
-package main
+package scratcher
 
 import (
+	"context"
 	"log"
 	"sync"
 	"time"
 
-	"nosql1h21-stock/scratching_yahoo_finance/mongodb"
-	"nosql1h21-stock/scratching_yahoo_finance/tickers"
-	"nosql1h21-stock/scratching_yahoo_finance/yahoo"
+	"nosql1h21-stock-backend/backend/internal/scratcher/mongodb"
+	"nosql1h21-stock-backend/backend/internal/scratcher/tickers"
+	"nosql1h21-stock-backend/backend/internal/scratcher/yahoo"
+
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func main() {
+func Scratch(ctx context.Context, collection *mongo.Collection) {
+	n, err := collection.CountDocuments(ctx, bson.M{})
+	if err != nil {
+		log.Fatal(err)
+	}
+	if n > 0 {
+		return
+	}
+
 	tickers, err := tickers.GetTickers()
 	if err != nil {
 		log.Fatal("GetTickers: ", err)
@@ -59,16 +71,10 @@ func main() {
 
 	log.Println("Full info was got for", len(companiesInfo), "of", len(tickers), "tickers in", time.Since(start))
 
-	mongoClient, disconnect, err := mongodb.Connect()
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer disconnect()
-
 	start = time.Now()
 	log.Println("Saving the info to the database")
 
-	err = mongodb.SaveCompaniesInfo(mongoClient, companiesInfo)
+	err = mongodb.SaveCompaniesInfo(collection, companiesInfo)
 	if err != nil {
 		log.Fatal(err)
 	}

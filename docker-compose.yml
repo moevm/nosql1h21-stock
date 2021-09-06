@@ -6,4 +6,7 @@ services:
     ports:
     - "8080:80"
 
+  mongo:
+    image: mongo
+
   # TODO
