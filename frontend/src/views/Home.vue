@@ -32,10 +32,9 @@ export default {
   },
   methods: {
     update() {
-      this.fragment = this.fragment.toLowerCase()
       this.pending++
       let url = "http://127.0.0.1:3000/search?" + [
-        "fragment=" + this.fragment,
+        "fragment=" + this.fragment.toLowerCase(),
         "countries=" + this.countries.join(),
         "sector=" + encodeURIComponent(this.sector),
         "industry=" + encodeURIComponent(this.industry),
