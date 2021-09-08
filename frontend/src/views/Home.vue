@@ -49,7 +49,11 @@ export default {
   },
   watch: {
     fragment() {
-      this.update()
+      if (this.fragment.trim()!=="") {
+        this.update()
+      }else {
+        this.stocks = []
+      }
     },
     countries() {
       this.update()
