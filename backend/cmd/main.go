@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"log"
 	"net/http"
@@ -12,6 +13,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
@@ -81,11 +83,31 @@ func cacheMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(fn)
 }
 
+func scratchIfNeeded(collection *mongo.Collection, drop bool) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+	defer cancel()
+
+	if !drop {
+		n, err := collection.CountDocuments(ctx, bson.M{})
+		if err != nil {
+			log.Fatal(err)
+		}
+		if n > 0 {
+			return
+		}
+	}
+
+	scratcher.Scratch(ctx, collection)
+}
+
 func main() {
 	cfg, err := config.New()
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	drop := flag.Bool("d", false, "drop the database at the start (the stocks data will be gotten again)")
+	flag.Parse()
 
 	client, disconnect, err := connectMongo(cfg.DBConn)
 	if err != nil {
@@ -95,9 +117,7 @@ func main() {
 
 	collection := client.Database("stock_market").Collection("stocks")
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Minute)
-	defer cancel()
-	scratcher.Scratch(ctx, collection)
+	scratchIfNeeded(collection, *drop)
 
 	service := service.NewService(collection)
 

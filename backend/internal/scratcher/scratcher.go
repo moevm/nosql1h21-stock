@@ -10,19 +10,10 @@ import (
 	"nosql1h21-stock-backend/backend/internal/scratcher/tickers"
 	"nosql1h21-stock-backend/backend/internal/scratcher/yahoo"
 
-	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
 func Scratch(ctx context.Context, collection *mongo.Collection) {
-	n, err := collection.CountDocuments(ctx, bson.M{})
-	if err != nil {
-		log.Fatal(err)
-	}
-	if n > 0 {
-		return
-	}
-
 	tickers, err := tickers.GetTickers()
 	if err != nil {
 		log.Fatal("GetTickers: ", err)
