@@ -9,14 +9,14 @@
     <p>Industry: {{ stock.Industry }}</p>
     <p>Summary: {{ stock.Summary }}</p>
     <p>Country: {{ stock.Locate.Country }}</p>
-    <p>Total cash: {{stock.FinancialData.TotalCash}}</p>
-    <p>Total cash per share: {{stock.FinancialData.TotalCashPerShare}}</p>
-    <p>Ebitda: {{stock.FinancialData.Ebitda}}</p>
-    <p>Total debt: {{stock.FinancialData.TotalDebt}}</p>
+    <p>Total cash: {{cur(stock.FinancialData.TotalCash)}}</p>
+    <p>Total cash per share: {{cur(stock.FinancialData.TotalCashPerShare)}}</p>
+    <p>Ebitda: {{cur(stock.FinancialData.Ebitda)}}</p>
+    <p>Total debt: {{cur(stock.FinancialData.TotalDebt)}}</p>
     <p>Quick ratio: {{stock.FinancialData.QuickRatio}}</p>
     <p>Current ratio: {{stock.FinancialData.CurrentRatio}}</p>
-    <p>Total revenue: {{stock.FinancialData.TotalRevenue}}</p>
-    <p>Revenue per share: {{stock.FinancialData.RevenuePerShare}}</p>
+    <p>Total revenue: {{cur(stock.FinancialData.TotalRevenue)}}</p>
+    <p>Revenue per share: {{cur(stock.FinancialData.RevenuePerShare)}}</p>
     <p>Debt to equity: {{stock.FinancialData.DebtToEquity}}</p>
     <p>Return on assets: {{stock.FinancialData.ReturnOnAssets}}</p>
     <p>Return on equity: {{stock.FinancialData.ReturnOnEquity}}</p>
@@ -33,11 +33,11 @@
           <div class="items">
             <div class="item">
               <div class="revenue" :style="{width: (item.Revenue / maxEarning * 300) + 'px'}" />
-              <div>{{item.Revenue}} {{stock.Earnings.FinancialCurrency}}</div>
+              <div>{{cur(item.Revenue)}}</div>
             </div>
             <div class="item">
               <div :class="{earnings: true, negative: item.Earnings < 0}" :style="{width: (Math.abs(item.Earnings) / maxEarning * 300) + 'px'}" />
-              <div>{{item.Earnings}} {{stock.Earnings.FinancialCurrency}}</div>
+              <div>{{cur(item.Earnings)}}</div>
             </div>
           </div>
         </div>
@@ -49,6 +49,7 @@
 <script>
 import Spinner from "@/components/Spinner";
 import {addToCompare} from "../to_compare";
+import {currency} from "../currency";
 
 export default {
   components: {Spinner},
@@ -79,6 +80,9 @@ export default {
     addToCompare() {
       addToCompare(this.stock)
     },
+    cur(amount) {
+      return currency(amount, this.stock.FinancialData.FinancialCurrency)
+    }
   },
 }
 </script>
