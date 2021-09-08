@@ -57,6 +57,7 @@ export default {
     return {
       stock: null,
       earningsMode: "Yearly",
+      toCompare,
     }
   },
   created() {
@@ -74,9 +75,6 @@ export default {
         max = Math.max(max, item.Revenue, Math.abs(item.Earnings))
       }
       return max
-    },
-    toCompare() {
-      return toCompare
     },
   },
   methods: {
