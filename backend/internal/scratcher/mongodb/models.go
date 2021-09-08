@@ -51,6 +51,7 @@ type FinancialData struct {
 	DebtToEquity      float64 `bson:"debt to equity,omitempty"`
 	ReturnOnAssets    float64 `bson:"roa,omitempty"`
 	ReturnOnEquity    float64 `bson:"roe,omitempty"`
+	FinancialCurrency string  `bson:"financial currency,omitempty"`
 }
 
 type Earnings struct {

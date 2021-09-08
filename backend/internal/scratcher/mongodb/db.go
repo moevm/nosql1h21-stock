@@ -50,6 +50,7 @@ func SaveCompaniesInfo(collection *mongo.Collection, companiesInfo map[string]*y
 				DebtToEquity:      float64(info.FinancialData.DebtToEquity),
 				ReturnOnAssets:    float64(info.FinancialData.ReturnOnAssets),
 				ReturnOnEquity:    float64(info.FinancialData.ReturnOnEquity),
+				FinancialCurrency: info.FinancialData.FinancialCurrency,
 			},
 			Earnings: Earnings{
 				Yearly:            nil,

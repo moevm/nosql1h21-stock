@@ -93,4 +93,5 @@ type FinancialData struct {
 	DebtToEquity      Number
 	ReturnOnAssets    Number
 	ReturnOnEquity    Number
+	FinancialCurrency string
 }
