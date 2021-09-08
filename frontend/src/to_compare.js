@@ -1,6 +1,9 @@
-export let toCompare = []
+import { reactive } from 'vue'
+
+export let toCompare = reactive([])
 
 export function addToCompare(stock) {
-    toCompare.push(stock)
-    toCompare = toCompare.slice(-2)
+    toCompare.unshift(stock)
+    while (toCompare.length > 2)
+        toCompare.pop()
 }

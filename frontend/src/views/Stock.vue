@@ -2,7 +2,7 @@
   <h2>Stock</h2>
   <Spinner v-if="!stock"/>
   <div v-else class="stock">
-    <button @click="addToCompare">Add to compare</button>
+    <button @click="addToCompare" :disabled="toCompare[0] && toCompare[0].Symbol === stock.Symbol">Add to compare</button>
     <p>Ticker: {{ stock.Symbol }}</p>
     <p>Name: {{ stock.ShortName }}</p>
     <p>Sector: {{ stock.Sector }}</p>
@@ -48,7 +48,7 @@
 
 <script>
 import Spinner from "@/components/Spinner";
-import {addToCompare} from "../to_compare";
+import {toCompare, addToCompare} from "../to_compare";
 import {currency} from "../currency";
 
 export default {
@@ -74,6 +74,9 @@ export default {
         max = Math.max(max, item.Revenue, Math.abs(item.Earnings))
       }
       return max
+    },
+    toCompare() {
+      return toCompare
     },
   },
   methods: {
