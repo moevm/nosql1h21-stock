@@ -1,5 +1,5 @@
 export function currency(amount, name) {
-    let factors = ["m", "b", "t"]
+    let factors = ["M", "B", "T"]
     let factor = ""
     for (let i = 0; i < factors.length; i++) {
         if (Math.abs(amount) < 10000)

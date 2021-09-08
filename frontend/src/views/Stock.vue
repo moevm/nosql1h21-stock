@@ -2,7 +2,7 @@
   <h2>Stock</h2>
   <Spinner v-if="!stock"/>
   <div v-else class="stock">
-    <button @click="addToCompare" :disabled="toCompare[0] && toCompare[0].Symbol === stock.Symbol">Add to compare</button>
+    <button @click="addToCompare" :disabled="toCompare.last().Symbol === stock.Symbol">Add to compare</button>
     <p>Ticker: {{ stock.Symbol }}</p>
     <p>Name: {{ stock.ShortName }}</p>
     <p>Sector: {{ stock.Sector }}</p>
