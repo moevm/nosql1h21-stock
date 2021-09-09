@@ -2,7 +2,6 @@ package handler
 
 import (
 	"context"
-	"encoding/json"
 	"net/http"
 )
 
@@ -28,5 +27,6 @@ func (h *ExportHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		writeResponse(w, r, err)
 		return
 	}
-	writeResponse(w, r, json.RawMessage(export))
+	w.Header().Set("Content-Disposition", `attachment; filename="stocks_data.json"`)
+	w.Write(export)
 }

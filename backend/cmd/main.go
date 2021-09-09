@@ -128,7 +128,7 @@ func main() {
 	router.Use(cors.AllowAll().Handler)
 
 	router.Group(func(router chi.Router) {
-		router.Use(cacheMiddleware)
+		// router.Use(cacheMiddleware)
 		registerHandler(router, &handler.StockHandler{Service: service})
 		registerHandler(router, &handler.SearchByTickerHandler{Service: service})
 		registerHandler(router, &handler.SearchByNameHandler{Service: service})
