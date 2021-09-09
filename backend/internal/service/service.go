@@ -2,7 +2,9 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"io"
 	"nosql1h21-stock-backend/backend/internal/model"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -144,4 +146,47 @@ func (s *Service) Search(ctx context.Context, r SearchRequest) (stocks []model.S
 		}
 	}
 	return s.findStocks(ctx, filter)
+}
+
+func (s *Service) Export(ctx context.Context) (jsonEncoded []byte, _ error) {
+	cur, err := s.collection.Find(ctx, bson.M{})
+	if err != nil {
+		return nil, nil
+	}
+	defer cur.Close(ctx)
+
+	stocks := []model.Stock{}
+	for cur.Next(ctx) {
+		var stock model.Stock
+		err := cur.Decode(&stock)
+		if err != nil {
+			return nil, err
+		}
+		stocks = append(stocks, stock)
+	}
+	if err := cur.Err(); err != nil {
+		return nil, err
+	}
+	return json.Marshal(stocks)
+}
+
+func (s *Service) Import(ctx context.Context, jsonEncoded io.Reader) error {
+	err := s.collection.Drop(ctx)
+	if err != nil {
+		return err
+	}
+
+	var stocks []model.Stock
+	err = json.NewDecoder(jsonEncoded).Decode(&stocks)
+	if err != nil {
+		return err
+	}
+
+	var documents []interface{}
+	for _, stock := range stocks {
+		documents = append(documents, stock)
+	}
+
+	_, err = s.collection.InsertMany(ctx, documents)
+	return err
 }

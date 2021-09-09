@@ -1,0 +1,239 @@
+[
+    {
+        "Symbol": "ABVC",
+        "ShortName": "ABVC Biopharma, Inc.",
+        "LongName": "ABVC BioPharma, Inc.",
+        "Summary": "American BriVision (Holding) Corporation, a clinical stage biopharmaceutical company, develops drugs and medical devices to fulfill unmet medical needs in the United States. The company is developing ABV-1501, a combination therapy for triple negative breast cancer; ABV-1504 for major depressive disorders; ABV-1505 for attention deficit hyperactivity disorder; ABV-1703 for the treatment of pancreatic cancer; ABV-1702 to treat myelodysplastic syndromes; ABV-1601 for treating depression in cancer patients; and ABV-1701 Vitargus for the treatment of retinal detachment or vitreous hemorrhage. It has a co-development agreement with Rgene Corporation; and collaboration agreements with BioHopeKing Corporation and BioFirst Corporation. The company was incorporated in 2015 and is based in Fremont, California. American BriVision (Holding) Corporation is a subsidiary of YuanGene Corporation.",
+        "Industry": "Biotechnology",
+        "Sector": "Healthcare",
+        "Staff": {
+            "Employees": 30,
+            "CompanyOfficers": [
+                {
+                    "Name": "Mr. Eugene  Jiang",
+                    "Age": 34,
+                    "Title": "Chairman \u0026 Chief Bus. Officer",
+                    "YearBorn": 1986,
+                    "TotalPay": 200000
+                },
+                {
+                    "Name": "Dr. Howard  Doong M.D., Ph.D.",
+                    "Age": 63,
+                    "Title": "Pres \u0026 CEO",
+                    "YearBorn": 1957,
+                    "TotalPay": 200000
+                },
+                {
+                    "Name": "Mr. Chihliang  An",
+                    "Age": 38,
+                    "Title": "Chief Financial Officer",
+                    "YearBorn": 1982,
+                    "TotalPay": 200000
+                },
+                {
+                    "Name": "Dr. Chi-Hsin  King",
+                    "Age": 72,
+                    "Title": "Chief Scientific Officer",
+                    "YearBorn": 1948,
+                    "TotalPay": 200000
+                },
+                {
+                    "Name": "Dr. Tsung-Shann  Jiang Ph.D.",
+                    "Age": 66,
+                    "Title": "Chief Strategy Officer, Member of Scientific Advisory Board \u0026 Director",
+                    "YearBorn": 1954,
+                    "TotalPay": 200000
+                }
+            ]
+        },
+        "Locate": {
+            "Address": "44370 Old Warm Springs Boulevard",
+            "City": "Fremont",
+            "State": "CA",
+            "Country": "United States"
+        },
+        "Contacts": {
+            "Phone": "510 668 0881",
+            "Website": "http://abvcpharma.com"
+        },
+        "FinancialData": {
+            "TotalCash": 924841,
+            "TotalCashPerShare": 0.038,
+            "Ebitda": 924841,
+            "TotalDebt": 6497289,
+            "QuickRatio": 0.341,
+            "CurrentRatio": 0.829,
+            "TotalRevenue": 472337,
+            "RevenuePerShare": 0.021,
+            "DebtToEquity": 1259.191,
+            "ReturnOnAssets": -0.76644,
+            "ReturnOnEquity": 0,
+            "FinancialCurrency": "USD"
+        },
+        "Earnings": {
+            "Yearly": [
+                { "Date": 2017, "Revenue": 0, "Earnings": -4242860 },
+                { "Date": 2018, "Revenue": 6956, "Earnings": -5575379 },
+                { "Date": 2019, "Revenue": 701719, "Earnings": -3641776 },
+                { "Date": 2020, "Revenue": 483045, "Earnings": -9791164 }
+            ],
+            "Quarterly": [
+                { "Date": "3Q2020", "Revenue": 115553, "Earnings": -1846046 },
+                { "Date": "4Q2020", "Revenue": 62193, "Earnings": -4848283 },
+                { "Date": "1Q2021", "Revenue": 263150, "Earnings": -1128505 },
+                { "Date": "2Q2021", "Revenue": 31441, "Earnings": -1971566 }
+            ],
+            "FinancialCurrency": "USD"
+        }
+    },
+    {
+        "Symbol": "BMO",
+        "ShortName": "Bank Of Montreal",
+        "LongName": "Bank of Montreal",
+        "Summary": "Bank of Montreal provides diversified financial services primarily in North America. The company's personal banking products and services include checking and savings accounts, credit cards, mortgages, and financial and investment advice services; and commercial banking products and services comprise business deposit accounts, commercial credit cards, business loans and commercial mortgages, cash management solutions, foreign exchange, specialized banking programs, treasury and payment solutions, and risk management products for small business and commercial banking customers. It also offers investment and wealth advisory services; digital investing services; financial services and solutions; and investment management, and trust and custody services to institutional, retail, and high net worth investors. In addition, the company provides life insurance, accident and sickness insurance, and annuity products; creditor and travel insurance to bank customers; and reinsurance solutions. Further, it offers client's debt and equity capital-raising services, as well as loan origination and syndication, balance sheet management, and treasury management; strategic advice on mergers and acquisitions, restructurings, and recapitalizations, as well as valuation and fairness opinions; and trade finance, risk mitigation, and other operating services. Additionally, the company provides research and access to markets for institutional, corporate, and retail clients; trading solutions that include debt, foreign exchange, interest rate, credit, equity, securitization and commodities; new product development and origination services, as well as risk management advice and services to hedge against fluctuations; and funding and liquidity management services to its clients. It operates through approximately 1,400 bank branches and 4,800 automated banking machines in Canada and the United States. The company was founded in 1817 and is headquartered in Montreal, Canada.",
+        "Industry": "Banks—Diversified",
+        "Sector": "Financial Services",
+        "Staff": {
+            "Employees": 43360,
+            "CompanyOfficers": [
+                {
+                    "Name": "Mr. William Darryl White",
+                    "Age": 48,
+                    "Title": "CEO \u0026 Director",
+                    "YearBorn": 1972,
+                    "TotalPay": 2757825
+                },
+                {
+                    "Name": "Mr. Thomas Earl Flynn",
+                    "Age": 56,
+                    "Title": "Vice Chairman",
+                    "YearBorn": 1964,
+                    "TotalPay": 1108653
+                },
+                {
+                    "Name": "Mr. Cameron  Fowler",
+                    "Age": 0,
+                    "Title": "Chief Strategy \u0026 Operations Officer",
+                    "YearBorn": 0,
+                    "TotalPay": 1618714
+                },
+                {
+                    "Name": "Mr. Daniel  Barclay",
+                    "Age": 0,
+                    "Title": "CEO \u0026 Group Head of BMO Capital Markets",
+                    "YearBorn": 0,
+                    "TotalPay": 2325328
+                },
+                {
+                    "Name": "Mr. David Robert Casper",
+                    "Age": 0,
+                    "Title": "U.S. CEO - BMO Financial Group, Chair \u0026 CEO - BMO Harris Bank N.A. \u0026 Group Head of North America com",
+                    "YearBorn": 0,
+                    "TotalPay": 1637517
+                },
+                {
+                    "Name": "Mr. Tayfun  Tuzun",
+                    "Age": 55,
+                    "Title": "Chief Financial Officer",
+                    "YearBorn": 1965,
+                    "TotalPay": 0
+                },
+                {
+                    "Name": "Mr. Steve  Tennyson",
+                    "Age": 0,
+                    "Title": "Chief Technology \u0026 Operations Officer",
+                    "YearBorn": 0,
+                    "TotalPay": 0
+                },
+                {
+                    "Name": "Ms. Jill  Homenuk CFA",
+                    "Age": 0,
+                    "Title": "Head of Investor Relations",
+                    "YearBorn": 0,
+                    "TotalPay": 0
+                },
+                {
+                    "Name": "Ms. Sharon Marie Haward-Laird",
+                    "Age": 0,
+                    "Title": "Gen. Counsel",
+                    "YearBorn": 0,
+                    "TotalPay": 0
+                },
+                {
+                    "Name": "Ms. Catherine Margaret Roche",
+                    "Age": 0,
+                    "Title": "Head of Marketing \u0026 Strategy",
+                    "YearBorn": 0,
+                    "TotalPay": 0
+                }
+            ]
+        },
+        "Locate": {
+            "Address": "129 rue Saint Jacques",
+            "City": "Montreal",
+            "State": "QC",
+            "Country": "Canada"
+        },
+        "Contacts": {
+            "Phone": "416-867-7366",
+            "Website": "http://www.bmo.com"
+        },
+        "FinancialData": {
+            "TotalCash": 334349008896,
+            "TotalCashPerShare": 516.506,
+            "Ebitda": 334349008896,
+            "TotalDebt": 153721995264,
+            "QuickRatio": 0,
+            "CurrentRatio": 0,
+            "TotalRevenue": 24470999040,
+            "RevenuePerShare": 37.942,
+            "DebtToEquity": 0,
+            "ReturnOnAssets": 0.0063300002,
+            "ReturnOnEquity": 0.110810004,
+            "FinancialCurrency": "CAD"
+        },
+        "Earnings": {
+            "Yearly": [
+                {
+                    "Date": 2017,
+                    "Revenue": 21361000000,
+                    "Earnings": 5337000000
+                },
+                {
+                    "Date": 2018,
+                    "Revenue": 22243000000,
+                    "Earnings": 5453000000
+                },
+                {
+                    "Date": 2019,
+                    "Revenue": 24611000000,
+                    "Earnings": 5758000000
+                },
+                { "Date": 2020, "Revenue": 22233000000, "Earnings": 5097000000 }
+            ],
+            "Quarterly": [
+                {
+                    "Date": "3Q2020",
+                    "Revenue": 6743000000,
+                    "Earnings": 1232000000
+                },
+                {
+                    "Date": "4Q2020",
+                    "Revenue": 5554000000,
+                    "Earnings": 1584000000
+                },
+                {
+                    "Date": "1Q2021",
+                    "Revenue": 6819000000,
+                    "Earnings": 2017000000
+                },
+                {
+                    "Date": "2Q2021",
+                    "Revenue": 5963000000,
+                    "Earnings": 1303000000
+                }
+            ],
+            "FinancialCurrency": "CAD"
+        }
+    }
+]

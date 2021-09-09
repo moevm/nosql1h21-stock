@@ -41,3 +41,11 @@ GET http://127.0.0.1:3000/search?countries=Russia
 
 ###
 GET http://127.0.0.1:3000/search?fragment=apple&sector=Real Estate
+
+###
+GET http://127.0.0.1:3000/export
+
+###
+POST http://127.0.0.1:3000/import
+
+< ./simple_import.json
