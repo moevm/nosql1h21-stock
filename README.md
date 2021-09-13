@@ -6,8 +6,8 @@
 2. Wait until the getting stocks info is completed (about 1 minute)
 3. Go to http://localhost:8080
 
-## Use case diagram
-![](https://github.com/moevm/nosql1h21-stock/blob/main/diagrams/use%20case%20diagram/use_case_diagram.png)
+## UI mockup and use cases
+[Wiki](https://github.com/moevm/nosql1h21-stock/wiki/UI-mockup-and-use-cases)
 ## Er diagram
 ![](https://github.com/moevm/nosql1h21-stock/blob/main/diagrams/er%20diagram/er_diagram.png)
 ## Data example (Apple)
