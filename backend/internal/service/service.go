@@ -164,3 +164,48 @@ func (s *Service) Import(ctx context.Context, jsonEncoded io.Reader) error {
 	_, err = s.collection.InsertMany(ctx, documents)
 	return err
 }
+
+type CountItem struct {
+	Key    string `bson:"_id"`
+	Amount int
+}
+
+type ErrInvalidArgument struct{}
+
+func (e ErrInvalidArgument) Error() string {
+	return "Invalid argument"
+}
+
+func (s *Service) Count(ctx context.Context, by string) ([]CountItem, error) {
+	switch by {
+	case "sector", "industry":
+		break
+	case "country":
+		by = "locate.country"
+	default:
+		return nil, ErrInvalidArgument{}
+	}
+
+	cur, err := s.collection.Aggregate(ctx, bson.A{
+		bson.M{"$group": bson.M{"_id": "$" + by, "amount": bson.M{"$sum": 1}}},
+		bson.M{"$sort": bson.M{"amount": -1}},
+	})
+	if err != nil {
+		return nil, err
+	}
+	defer cur.Close(ctx)
+
+	items := []CountItem{}
+	for cur.Next(ctx) {
+		var item CountItem
+		err := cur.Decode(&item)
+		if err != nil {
+			return nil, err
+		}
+		items = append(items, item)
+	}
+	if err := cur.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}

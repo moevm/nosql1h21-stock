@@ -34,3 +34,6 @@ GET http://127.0.0.1:3000/export
 POST http://127.0.0.1:3000/import
 
 < ./simple_import.json
+
+###
+GET http://127.0.0.1:3000/count?by=sector

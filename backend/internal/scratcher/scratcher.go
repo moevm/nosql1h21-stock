@@ -45,6 +45,8 @@ func Scratch(ctx context.Context, collection *mongo.Collection) {
 			incompleteInfo := companyInfo.Price.CompanyLongName == "" ||
 				companyInfo.Price.CompanyShortName == "" ||
 				companyInfo.AssetProfile == nil ||
+				companyInfo.AssetProfile.Industry == "" ||
+				companyInfo.AssetProfile.Sector == "" ||
 				companyInfo.Earnings == nil ||
 				companyInfo.FinancialData == nil ||
 				companyInfo.FinancialData.TotalCash == 0 ||
