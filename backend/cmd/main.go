@@ -130,12 +130,9 @@ func main() {
 	router.Group(func(router chi.Router) {
 		// router.Use(cacheMiddleware)
 		registerHandler(router, &handler.StockHandler{Service: service})
-		registerHandler(router, &handler.SearchByTickerHandler{Service: service})
-		registerHandler(router, &handler.SearchByNameHandler{Service: service})
 		registerHandler(router, &handler.CountriesHandler{Service: service})
 		registerHandler(router, &handler.SectorsHandler{Service: service})
 		registerHandler(router, &handler.IndustriesHandler{Service: service})
-		registerHandler(router, &handler.FilterHandler{Service: service})
 		registerHandler(router, &handler.SearchHandler{Service: service})
 		registerHandler(router, &handler.ExportHandler{Service: service})
 		registerHandler(router, &handler.ImportHandler{Service: service})

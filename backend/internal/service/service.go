@@ -66,18 +66,6 @@ func (s *Service) findStocks(ctx context.Context, filter interface{}) (stocks []
 	return stocks, nil
 }
 
-func (s *Service) SearchByTicker(ctx context.Context, tickerFragment string) (stocks []model.StockOverview, _ error) {
-	return s.findStocks(ctx, bson.M{
-		"symbol": bson.M{"$regex": tickerFragment},
-	})
-}
-
-func (s *Service) SearchByName(ctx context.Context, nameFragment string) (stocks []model.StockOverview, _ error) {
-	return s.findStocks(ctx, bson.M{
-		"long name": bson.M{"$regex": nameFragment},
-	})
-}
-
 func (s *Service) getDistinct(ctx context.Context, field string, filter interface{}) ([]string, error) {
 	rawValues, err := s.collection.Distinct(ctx, field, filter)
 	if err != nil {
@@ -101,20 +89,6 @@ func (s *Service) GetSectors(ctx context.Context) (sectors []string, _ error) {
 
 func (s *Service) GetIndustries(ctx context.Context, sector string) (industries []string, _ error) {
 	return s.getDistinct(ctx, "industry", bson.M{"sector": sector})
-}
-
-func (s *Service) Filter(ctx context.Context, countries []string, sector, industry string) (stocks []model.StockOverview, _ error) {
-	filter := bson.M{}
-	if countries != nil {
-		filter["locate.country"] = bson.M{"$in": countries}
-	}
-	if sector != "" {
-		filter["sector"] = sector
-	}
-	if industry != "" {
-		filter["industry"] = industry
-	}
-	return s.findStocks(ctx, filter)
 }
 
 type SearchRequest struct {

@@ -7,12 +7,6 @@ GET http://127.0.0.1:3000/stock/AAPL?fields=Symbol,ShortName
 GET http://127.0.0.1:3000/stock/GOOG
 
 ###
-GET http://127.0.0.1:3000/search-by-ticker/GO
-
-###
-GET http://127.0.0.1:3000/search-by-name/Apple
-
-###
 GET http://127.0.0.1:3000/countries
 
 ###
@@ -25,16 +19,7 @@ GET http://127.0.0.1:3000/industries-in-sector/Energy
 GET http://127.0.0.1:3000/industries-in-sector/Communication Services
 
 ### All stocks
-GET http://127.0.0.1:3000/filter
-
-###
-GET http://127.0.0.1:3000/filter?countries=Bermuda,Switzerland
-
-###
-GET http://127.0.0.1:3000/filter?sector=Communication Services&industry=Telecom Services
-
-###
-GET http://127.0.0.1:3000/filter?sector=Consumer Cyclical&industry=Internet Retail&countries=United States
+GET http://127.0.0.1:3000/search
 
 ###
 GET http://127.0.0.1:3000/search?countries=Russia
