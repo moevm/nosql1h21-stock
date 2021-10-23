@@ -42,7 +42,7 @@ func SaveCompaniesInfo(collection *mongo.Collection, companiesInfo map[string]*y
 			FinancialData: model.FinancialData{
 				TotalCash:         float64(info.FinancialData.TotalCash),
 				TotalCashPerShare: float64(info.FinancialData.TotalCashPerShare),
-				Ebitda:            float64(info.FinancialData.TotalCash),
+				Ebitda:            float64(info.FinancialData.Ebitda),
 				TotalDebt:         float64(info.FinancialData.TotalDebt),
 				QuickRatio:        float64(info.FinancialData.QuickRatio),
 				CurrentRatio:      float64(info.FinancialData.CurrentRatio),
