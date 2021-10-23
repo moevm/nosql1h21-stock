@@ -2,7 +2,9 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"io"
 	"nosql1h21-stock-backend/backend/internal/model"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -64,18 +66,6 @@ func (s *Service) findStocks(ctx context.Context, filter interface{}) (stocks []
 	return stocks, nil
 }
 
-func (s *Service) SearchByTicker(ctx context.Context, tickerFragment string) (stocks []model.StockOverview, _ error) {
-	return s.findStocks(ctx, bson.M{
-		"symbol": bson.M{"$regex": tickerFragment},
-	})
-}
-
-func (s *Service) SearchByName(ctx context.Context, nameFragment string) (stocks []model.StockOverview, _ error) {
-	return s.findStocks(ctx, bson.M{
-		"long name": bson.M{"$regex": nameFragment},
-	})
-}
-
 func (s *Service) getDistinct(ctx context.Context, field string, filter interface{}) ([]string, error) {
 	rawValues, err := s.collection.Distinct(ctx, field, filter)
 	if err != nil {
@@ -99,20 +89,6 @@ func (s *Service) GetSectors(ctx context.Context) (sectors []string, _ error) {
 
 func (s *Service) GetIndustries(ctx context.Context, sector string) (industries []string, _ error) {
 	return s.getDistinct(ctx, "industry", bson.M{"sector": sector})
-}
-
-func (s *Service) Filter(ctx context.Context, countries []string, sector, industry string) (stocks []model.StockOverview, _ error) {
-	filter := bson.M{}
-	if countries != nil {
-		filter["locate.country"] = bson.M{"$in": countries}
-	}
-	if sector != "" {
-		filter["sector"] = sector
-	}
-	if industry != "" {
-		filter["industry"] = industry
-	}
-	return s.findStocks(ctx, filter)
 }
 
 type SearchRequest struct {
@@ -144,4 +120,92 @@ func (s *Service) Search(ctx context.Context, r SearchRequest) (stocks []model.S
 		}
 	}
 	return s.findStocks(ctx, filter)
+}
+
+func (s *Service) Export(ctx context.Context) (jsonEncoded []byte, _ error) {
+	cur, err := s.collection.Find(ctx, bson.M{})
+	if err != nil {
+		return nil, nil
+	}
+	defer cur.Close(ctx)
+
+	stocks := []model.Stock{}
+	for cur.Next(ctx) {
+		var stock model.Stock
+		err := cur.Decode(&stock)
+		if err != nil {
+			return nil, err
+		}
+		stocks = append(stocks, stock)
+	}
+	if err := cur.Err(); err != nil {
+		return nil, err
+	}
+	return json.Marshal(stocks)
+}
+
+func (s *Service) Import(ctx context.Context, jsonEncoded io.Reader) error {
+	err := s.collection.Drop(ctx)
+	if err != nil {
+		return err
+	}
+
+	var stocks []model.Stock
+	err = json.NewDecoder(jsonEncoded).Decode(&stocks)
+	if err != nil {
+		return err
+	}
+
+	var documents []interface{}
+	for _, stock := range stocks {
+		documents = append(documents, stock)
+	}
+
+	_, err = s.collection.InsertMany(ctx, documents)
+	return err
+}
+
+type CountItem struct {
+	Key    string `bson:"_id"`
+	Amount int
+}
+
+type ErrInvalidArgument struct{}
+
+func (e ErrInvalidArgument) Error() string {
+	return "Invalid argument"
+}
+
+func (s *Service) Count(ctx context.Context, by string) ([]CountItem, error) {
+	switch by {
+	case "sector", "industry":
+		break
+	case "country":
+		by = "locate.country"
+	default:
+		return nil, ErrInvalidArgument{}
+	}
+
+	cur, err := s.collection.Aggregate(ctx, bson.A{
+		bson.M{"$group": bson.M{"_id": "$" + by, "amount": bson.M{"$sum": 1}}},
+		bson.M{"$sort": bson.M{"amount": -1}},
+	})
+	if err != nil {
+		return nil, err
+	}
+	defer cur.Close(ctx)
+
+	items := []CountItem{}
+	for cur.Next(ctx) {
+		var item CountItem
+		err := cur.Decode(&item)
+		if err != nil {
+			return nil, err
+		}
+		items = append(items, item)
+	}
+	if err := cur.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }

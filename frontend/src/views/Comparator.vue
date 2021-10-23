@@ -16,10 +16,14 @@
 
 <script>
 import {toCompare} from "../to_compare";
+import {currency} from "../currency";
 
 export default {
   components: {},
   data() {
+    let cur = (stock, amount) => {
+      return currency(amount, stock.FinancialData.FinancialCurrency)
+    }
     return {
       parameters: [
         {label: "Ticker", field: stock => stock.Symbol, better: 0},
@@ -27,18 +31,17 @@ export default {
         {label: "Sector", field: stock => stock.Sector, better: 0},
         {label: "Industry", field: stock => stock.Industry, better: 0},
         {label: "Country", field: stock => stock.Locate.Country, better: 0},
-        {label: "Total cash", field: stock => stock.FinancialData.TotalCash, better: 1},
-        {label: "Total cash per share", field: stock => stock.FinancialData.TotalCashPerShare, better: 1},
-        {label: "Ebitda", field: stock => stock.FinancialData.Ebitda, better: 1},
-        {label: "Total debt", field: stock => stock.FinancialData.TotalDebt, better: -1},
+        {label: "Total cash", field: stock => cur(stock, stock.FinancialData.TotalCash), better: 0},
+        {label: "Total cash per share", field: stock => cur(stock,  stock.FinancialData.TotalCashPerShare), better: 0},
+        {label: "Ebitda", field: stock => cur(stock, stock.FinancialData.Ebitda), better: 0},
+        {label: "Total debt", field: stock => cur(stock, stock.FinancialData.TotalDebt), better: 0},
         {label: "Quick ratio", field: stock => stock.FinancialData.QuickRatio, better: 1},
         {label: "Current ratio", field: stock => stock.FinancialData.CurrentRatio, better: 1},
-        {label: "Total revenue", field: stock => stock.FinancialData.TotalRevenue, better: 1},
-        {label: "Revenue per share", field: stock => stock.FinancialData.RevenuePerShare, better: 1},
+        {label: "Total revenue", field: stock => cur(stock, stock.FinancialData.TotalRevenue), better: 0},
+        {label: "Revenue per share", field: stock => cur(stock, stock.FinancialData.RevenuePerShare), better: 0},
         {label: "Debt to equity", field: stock => stock.FinancialData.DebtToEquity, better: -1},
         {label: "Return on assets", field: stock => stock.FinancialData.ReturnOnAssets, better: 1},
         {label: "Return on equity", field: stock => stock.FinancialData.ReturnOnEquity, better: 1},
-        
       ],
     }
   },
@@ -54,7 +57,10 @@ export default {
       return [
         better === 1 ? "red" : "green",
         better === 1 ? "green" : "red",
-      ][field(toCompare[0]) < field(toCompare[1]) ? 0 : 1]
+        "",
+      ][field(toCompare[0]) < field(toCompare[1]) ? 0 :
+        field(toCompare[0]) > field(toCompare[1]) ? 1 :
+        2]
     }
   }
 }
