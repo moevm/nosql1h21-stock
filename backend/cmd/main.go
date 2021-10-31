@@ -137,6 +137,7 @@ func main() {
 		registerHandler(router, &handler.ExportHandler{Service: service})
 		registerHandler(router, &handler.ImportHandler{Service: service})
 		registerHandler(router, &handler.CountHandler{Service: service})
+		registerHandler(router, &handler.TableHandler{Service: service})
 	})
 
 	addr := fmt.Sprintf(":%d", cfg.Port)

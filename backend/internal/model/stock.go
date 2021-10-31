@@ -81,3 +81,17 @@ type Quarter struct {
 	Revenue  int
 	Earnings int
 }
+
+type TableFilterData struct {
+	Symbol   string
+	Name     string `bson:"short name,omitempty"`
+	Sector   string `bson:"sector,omitempty"`
+	Industry string `bson:"industry,omitempty"`
+	Staff    struct {
+		Employees int `bson:"employees,omitempty"`
+	}
+	Locate struct {
+		Country string `bson:"country,omitempty"`
+	}
+	FinancialData FinancialData `bson:"financial data"`
+}

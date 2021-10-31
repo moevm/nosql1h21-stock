@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"io"
 	"nosql1h21-stock-backend/backend/internal/model"
+	"strconv"
+	"strings"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -208,4 +210,134 @@ func (s *Service) Count(ctx context.Context, by string) ([]CountItem, error) {
 		return nil, err
 	}
 	return items, nil
+}
+
+type TableFilterRequest struct {
+	SectorFilter      string
+	IndustryFilter    string
+	EmployeesFilter   string
+	CountriesFilter   []string
+	TotalCash         string
+	TotalCashPerShare string
+	Ebitda            string
+	TotalDebt         string
+	QuickRatio        string
+	CurrentRatio      string
+	TotalRevenue      string
+	RevenuePerShare   string
+	DebtToEquity      string
+	ReturnOnAssets    string
+	ReturnOnEquity    string
+}
+
+func (s *Service) filerStocks(ctx context.Context, filter interface{}) (stocks []model.TableFilterData, _ error) {
+	cur, err := s.collection.Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+	defer cur.Close(ctx)
+
+	stocks = []model.TableFilterData{}
+	for cur.Next(ctx) {
+		var stock model.TableFilterData
+		err := cur.Decode(&stock)
+		if err != nil {
+			return nil, err
+		}
+		stocks = append(stocks, stock)
+	}
+	if err := cur.Err(); err != nil {
+		return nil, err
+	}
+	return stocks, nil
+}
+
+func setFilterForInValue(value string, filterValue string, filter *bson.M) {
+	if value[0:1] == ">" {
+		employeesCountString := strings.ReplaceAll(value, ">", "")
+		employeesCount, err := strconv.Atoi(employeesCountString)
+		if err == nil {
+			filter := *(filter)
+			filter[filterValue] = bson.M{"$gte": employeesCount}
+		}
+	} else if value[0:1] == "<" {
+		employeesCountString := strings.ReplaceAll(value, "<", "")
+		employeesCount, err := strconv.Atoi(employeesCountString)
+		if err == nil {
+			filter := *(filter)
+			filter[filterValue] = bson.M{"$lte": employeesCount}
+		}
+	} else {
+		employeesCount, err := strconv.Atoi(value)
+		if err == nil {
+			filter := *(filter)
+			filter[filterValue] = bson.M{"$eq": employeesCount}
+		}
+	}
+}
+
+func (s *Service) TableFilter(ctx context.Context, r TableFilterRequest) (stocks []model.TableFilterData, _ error) {
+	filter := bson.M{}
+
+	if r.SectorFilter != "" {
+		filter["sector"] = r.SectorFilter
+	}
+
+	if r.IndustryFilter != "" {
+		filter["industry"] = r.IndustryFilter
+	}
+
+	if r.CountriesFilter != nil {
+		filter["locate.country"] = bson.M{"$in": r.CountriesFilter}
+	}
+
+	if r.EmployeesFilter != "" {
+		setFilterForInValue(r.EmployeesFilter, "staff.employees", &filter)
+	}
+
+	if r.TotalCash != "" {
+		setFilterForInValue(r.TotalCash, "financial data.total cash", &filter)
+	}
+
+	if r.TotalCashPerShare != "" {
+		setFilterForInValue(r.TotalCashPerShare, "financial data.total cash per share", &filter)
+	}
+
+	if r.Ebitda != "" {
+		setFilterForInValue(r.Ebitda, "financial data.ebitda", &filter)
+	}
+
+	if r.TotalDebt != "" {
+		setFilterForInValue(r.TotalDebt, "financial data.total debt", &filter)
+	}
+
+	if r.QuickRatio != "" {
+		setFilterForInValue(r.QuickRatio, "financial data.quick ratio", &filter)
+	}
+
+	if r.CurrentRatio != "" {
+		setFilterForInValue(r.CurrentRatio, "financial data.current ratio", &filter)
+	}
+
+	if r.TotalRevenue != "" {
+		setFilterForInValue(r.TotalRevenue, "financial data.total revenue", &filter)
+	}
+
+	if r.RevenuePerShare != "" {
+		setFilterForInValue(r.RevenuePerShare, "financial data.revenue per share", &filter)
+	}
+
+	if r.DebtToEquity != "" {
+		setFilterForInValue(r.DebtToEquity, "financial data.debt to equity", &filter)
+	}
+
+	if r.ReturnOnAssets != "" {
+		setFilterForInValue(r.ReturnOnAssets, "financial data.roa", &filter)
+	}
+
+	if r.ReturnOnEquity != "" {
+		setFilterForInValue(r.ReturnOnEquity, "financial data.roe", &filter)
+	}
+
+	return s.filerStocks(ctx, filter)
 }

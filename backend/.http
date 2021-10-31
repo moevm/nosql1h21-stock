@@ -36,4 +36,6 @@ POST http://127.0.0.1:3000/import
 < ./simple_import.json
 
 ###
-GET http://127.0.0.1:3000/count?by=sector
+#GET http://127.0.0.1:3000/count?by=sector
+
+GET http://127.0.0.1:3000/table?sector=Technology&industry=Consumer Electronics&countries=United States&employees=>1000&total cash=>100000000
