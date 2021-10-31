@@ -5,7 +5,8 @@
     <div><router-link to="/">Search</router-link></div>
     <div><router-link to="/comparator">Compare</router-link></div>
     <div><router-link to="/diagram">Diagram</router-link></div>
-    <div> <a href="#">Table</a></div>
+<!--    <div> <a href="#">Table</a></div>-->
+    <div><router-link to="/table">Table</router-link> </div>
     <div><a href="http://127.0.0.1:3000/export">Export data</a></div>
     <div><a href="#" @click="Import">Import data</a></div>
     <input type='file' accept='.json' id="fileInput">
