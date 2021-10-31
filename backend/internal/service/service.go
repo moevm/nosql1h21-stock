@@ -252,7 +252,7 @@ func (s *Service) filerStocks(ctx context.Context, filter interface{}) (stocks [
 	return stocks, nil
 }
 
-func setFilterForInValue(value string, filterValue string, filter *bson.M) {
+func setFilterForIntValue(value string, filterValue string, filter *bson.M) {
 	if value[0:1] == ">" {
 		employeesCountString := strings.ReplaceAll(value, ">", "")
 		employeesCount, err := strconv.Atoi(employeesCountString)
@@ -276,6 +276,30 @@ func setFilterForInValue(value string, filterValue string, filter *bson.M) {
 	}
 }
 
+func setFilterForFloatValue(value string, filterValue string, filter *bson.M) {
+	if value[0:1] == ">" {
+		employeesCountString := strings.ReplaceAll(value, ">", "")
+		employeesCount, err := strconv.ParseFloat(employeesCountString, 32)
+		if err == nil {
+			filter := *(filter)
+			filter[filterValue] = bson.M{"$gte": employeesCount}
+		}
+	} else if value[0:1] == "<" {
+		employeesCountString := strings.ReplaceAll(value, "<", "")
+		employeesCount, err := strconv.ParseFloat(employeesCountString, 32)
+		if err == nil {
+			filter := *(filter)
+			filter[filterValue] = bson.M{"$lte": employeesCount}
+		}
+	} else {
+		employeesCount, err := strconv.ParseFloat(value, 32)
+		if err == nil {
+			filter := *(filter)
+			filter[filterValue] = bson.M{"$eq": employeesCount}
+		}
+	}
+}
+
 func (s *Service) TableFilter(ctx context.Context, r TableFilterRequest) (stocks []model.TableFilterData, _ error) {
 	filter := bson.M{}
 
@@ -292,51 +316,51 @@ func (s *Service) TableFilter(ctx context.Context, r TableFilterRequest) (stocks
 	}
 
 	if r.EmployeesFilter != "" {
-		setFilterForInValue(r.EmployeesFilter, "staff.employees", &filter)
+		setFilterForIntValue(r.EmployeesFilter, "staff.employees", &filter)
 	}
 
 	if r.TotalCash != "" {
-		setFilterForInValue(r.TotalCash, "financial data.total cash", &filter)
+		setFilterForIntValue(r.TotalCash, "financial data.total cash", &filter)
 	}
 
 	if r.TotalCashPerShare != "" {
-		setFilterForInValue(r.TotalCashPerShare, "financial data.total cash per share", &filter)
+		setFilterForFloatValue(r.TotalCashPerShare, "financial data.total cash per share", &filter)
 	}
 
 	if r.Ebitda != "" {
-		setFilterForInValue(r.Ebitda, "financial data.ebitda", &filter)
+		setFilterForIntValue(r.Ebitda, "financial data.ebitda", &filter)
 	}
 
 	if r.TotalDebt != "" {
-		setFilterForInValue(r.TotalDebt, "financial data.total debt", &filter)
+		setFilterForIntValue(r.TotalDebt, "financial data.total debt", &filter)
 	}
 
 	if r.QuickRatio != "" {
-		setFilterForInValue(r.QuickRatio, "financial data.quick ratio", &filter)
+		setFilterForFloatValue(r.QuickRatio, "financial data.quick ratio", &filter)
 	}
 
 	if r.CurrentRatio != "" {
-		setFilterForInValue(r.CurrentRatio, "financial data.current ratio", &filter)
+		setFilterForFloatValue(r.CurrentRatio, "financial data.current ratio", &filter)
 	}
 
 	if r.TotalRevenue != "" {
-		setFilterForInValue(r.TotalRevenue, "financial data.total revenue", &filter)
+		setFilterForIntValue(r.TotalRevenue, "financial data.total revenue", &filter)
 	}
 
 	if r.RevenuePerShare != "" {
-		setFilterForInValue(r.RevenuePerShare, "financial data.revenue per share", &filter)
+		setFilterForFloatValue(r.RevenuePerShare, "financial data.revenue per share", &filter)
 	}
 
 	if r.DebtToEquity != "" {
-		setFilterForInValue(r.DebtToEquity, "financial data.debt to equity", &filter)
+		setFilterForFloatValue(r.DebtToEquity, "financial data.debt to equity", &filter)
 	}
 
 	if r.ReturnOnAssets != "" {
-		setFilterForInValue(r.ReturnOnAssets, "financial data.roa", &filter)
+		setFilterForFloatValue(r.ReturnOnAssets, "financial data.roa", &filter)
 	}
 
 	if r.ReturnOnEquity != "" {
-		setFilterForInValue(r.ReturnOnEquity, "financial data.roe", &filter)
+		setFilterForFloatValue(r.ReturnOnEquity, "financial data.roe", &filter)
 	}
 
 	return s.filerStocks(ctx, filter)
