@@ -292,10 +292,10 @@ func setFilterForFloatValue(value string, filterValue string, filter *bson.M) {
 			filter[filterValue] = bson.M{"$lte": employeesCount}
 		}
 	} else {
-		employeesCount, err := strconv.ParseFloat(value, 32)
+		employeesCount, err := strconv.ParseFloat(value, len(value))
 		if err == nil {
 			filter := *(filter)
-			filter[filterValue] = bson.M{"$eq": employeesCount}
+			filter[filterValue] = employeesCount
 		}
 	}
 }
