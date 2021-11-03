@@ -1,154 +1,168 @@
 <template>
-  <div>
-    <!--    <input type="checkbox" id="jack" value="Джек" v-model="checkedNames">-->
-    <!--    <label for="jack">Джек</label>-->
-    <!--    <input type="checkbox" id="jack2" value="Джек" v-model="checkedNames">-->
-    <!--    <label for="jack2">Джек2</label>-->
-    <!--    <input type="checkbox" id="jack3" value="Джек" v-model="checkedNames">-->
-    <!--    <label for="jack3">Джек3</label>-->
-    <!--    <input type="checkbox" id="jack4" value="Джек" v-model="checkedNames">-->
-    <!--    <label for="jack4">Джек4</label>-->
 
-    <input type="checkbox" id="Employees" value="Employees" v-model="checkedNames">
-    <label for="Employees">Employees</label>
-    <select v-model="employees_selected">
-      <option v-for="option in options" v-bind:value="option.value">
-        {{ option.text }}
-      </option>
-    </select>
-    <input type="number" v-model="Employees" placeholder="">
-    <br>
+  <button v-on:click="isShowFilters = !isShowFilters">{{btnFilterText()}}</button>
 
-    <input type="checkbox" id="Total Cash" value="Total Cash" v-model="checkedNames">
-    <label for="Total Cash">Total Cash</label>
-    <select v-model="total_cash_selected">
-      <option v-for="option in options" v-bind:value="option.value">
-        {{ option.text }}
-      </option>
-    </select>
-    <input type="number" v-model="this.TotalCash" placeholder="">
-    <br>
+  <div v-show="isShowFilters">
+    <div>
+      <CountriesSelector @update:countries="countries = $event"/>
+      <SectorIndustrySelector @update:sector="sector = $event" @update:industry="industry = $event"/>
+      <br>
+    </div>
 
-    <input type="checkbox" id="Total Cash per share" value="Total Cash per share" v-model="checkedNames">
-    <label for="Total Cash per share">Total Cash per share</label>
-    <select v-model="total_cash_per_share_selected">
-      <option v-for="option in options" v-bind:value="option.value">
-        {{ option.text }}
-      </option>
-    </select>
-    <input type="number" v-model="this.TotalCashPerShare" placeholder="">
-    <br>
+    <table class="content-table">
+      <tbody>
+      <tr>
+        <td>1</td>
+        <td><input type="checkbox" id="Employees" value="Employees" v-model="checkedNames"></td>
+        <td><label for="Employees">Employees</label></td>
+        <td>
+          <select v-model="employees_selected">
+            <option v-for="option in options" v-bind:value="option.value">
+              {{ option.text }}
+            </option>
+          </select>
+        </td>
+        <td><input type="number" v-model="Employees" placeholder=""></td>
+      </tr>
 
-    <input type="checkbox" id="Ebitda" value="Ebitda" v-model="checkedNames">
-    <label for="Ebitda">Ebitda</label>
-    <select v-model="ebitda_selected">
-      <option v-for="option in options" v-bind:value="option.value">
-        {{ option.text }}
-      </option>
-    </select>
-    <input type="number" v-model="this.Ebitda" placeholder="">
-    <br>
-
-    <input type="checkbox" id="Total Debt" value="Total Debt" v-model="checkedNames">
-    <label for="Total Debt">Total Debt</label>
-    <select v-model="total_debt_selected">
-      <option v-for="option in options" v-bind:value="option.value">
-        {{ option.text }}
-      </option>
-    </select>
-    <input type="number" v-model="this.TotalDebt" placeholder="">
-    <br>
-
-    <input type="checkbox" id="Quick ratio" value="Quick ratio" v-model="checkedNames">
-    <label for="Quick ratio">Quick ratio</label>
-    <select v-model="quick_ratio_selected">
-      <option v-for="option in options" v-bind:value="option.value">
-        {{ option.text }}
-      </option>
-    </select>
-    <input type="number" v-model="this.QuickRatio" placeholder="">
-    <br>
-
-    <input type="checkbox" id="Current ratio" value="Current ratio" v-model="checkedNames">
-    <label for="Current ratio">Current ratio</label>
-    <select v-model="current_ratio_selected">
-      <option v-for="option in options" v-bind:value="option.value">
-        {{ option.text }}
-      </option>
-    </select>
-    <input type="number" v-model="this.CurrentRatio" placeholder="">
-    <br>
-
-    <input type="checkbox" id="Total Revenue" value="Total Revenue" v-model="checkedNames">
-    <label for="Total Revenue">Total Revenue</label>
-    <select v-model="total_revenue_selected">
-      <option v-for="option in options" v-bind:value="option.value">
-        {{ option.text }}
-      </option>
-    </select>
-    <input type="number" v-model="this.TotalRevenue" placeholder="">
-    <br>
-
-    <input type="checkbox" id="Revenue per share" value="Revenue per share" v-model="checkedNames">
-    <label for="Revenue per share">Revenue per share</label>
-    <select v-model="revenue_per_share_selected">
-      <option v-for="option in options" v-bind:value="option.value">
-        {{ option.text }}
-      </option>
-    </select>
-    <input type="number" v-model="this.RevenuePerShare" placeholder="">
-    <br>
-
-    <input type="checkbox" id="Debt to equity" value="Debt to equity" v-model="checkedNames">
-    <label for="Debt to equity">Debt to equity</label>
-    <select v-model="debt_to_equity_selected">
-      <option v-for="option in options" v-bind:value="option.value">
-        {{ option.text }}
-      </option>
-    </select>
-    <input type="number" v-model="this.DebtToEquity" placeholder="">
-    <br>
-
-    <input type="checkbox" id="Roa" value="Roa" v-model="checkedNames">
-    <label for="Roa">Roa</label>
-    <select v-model="roa_selected">
-      <option v-for="option in options" v-bind:value="option.value">
-        {{ option.text }}
-      </option>
-    </select>
-    <input type="number" v-model="this.Roa" placeholder="">
-    <br>
-
-    <input type="checkbox" id="Roe" value="Roe" v-model="checkedNames">
-    <label for="Roe">Roe</label>
-    <select v-model="roe_selected">
-      <option v-for="option in options" v-bind:value="option.value">
-        {{ option.text }}
-      </option>
-    </select>
-    <input type="number" v-model="this.Roe" placeholder="">
-    <br>
-
-    <span>Отмеченные имена: {{ checkedNames }}</span>
-
-    <!--    <br>
-        <select v-model="employees_selected">
+      <tr>
+        <td>2</td>
+        <td><input type="checkbox" id="Total Cash" value="Total Cash" v-model="checkedNames"></td>
+        <td><label for="Total Cash">Total Cash</label></td>
+        <td><select v-model="total_cash_selected">
           <option v-for="option in options" v-bind:value="option.value">
             {{ option.text }}
           </option>
-        </select>
-        <span>Выбрано: {{ employees_selected }}</span>
+        </select></td>
+        <td><input type="number" v-model="this.TotalCash" placeholder=""></td>
+      </tr>
 
-        <br>
-        <select v-model="total_cash_selected">
+      <tr>
+        <td>3</td>
+        <td><input type="checkbox" id="Total Cash per share" value="Total Cash per share" v-model="checkedNames"></td>
+        <td><label for="Total Cash per share">Total Cash per share</label></td>
+        <td><select v-model="total_cash_per_share_selected">
           <option v-for="option in options" v-bind:value="option.value">
             {{ option.text }}
           </option>
-        </select>
-        <span>Выбрано: {{ total_cash_selected }}</span>-->
+        </select></td>
+        <td><input type="number" v-model="this.TotalCashPerShare" placeholder=""></td>
+      </tr>
 
+      <tr>
+        <td>4</td>
+        <td><input type="checkbox" id="Ebitda" value="Ebitda" v-model="checkedNames"></td>
+        <td><label for="Ebitda">Ebitda</label></td>
+        <td><select v-model="ebitda_selected">
+          <option v-for="option in options" v-bind:value="option.value">
+            {{ option.text }}
+          </option>
+        </select></td>
+        <td><input type="number" v-model="this.Ebitda" placeholder=""></td>
+      </tr>
+
+      <tr>
+        <td>5</td>
+        <td><input type="checkbox" id="Total Debt" value="Total Debt" v-model="checkedNames"></td>
+        <td><label for="Total Debt">Total Debt</label></td>
+        <td><select v-model="total_debt_selected">
+          <option v-for="option in options" v-bind:value="option.value">
+            {{ option.text }}
+          </option>
+        </select></td>
+        <td><input type="number" v-model="this.TotalDebt" placeholder=""></td>
+      </tr>
+
+
+      <tr>
+        <td>6</td>
+        <td><input type="checkbox" id="Quick ratio" value="Quick ratio" v-model="checkedNames"></td>
+        <td><label for="Quick ratio">Quick ratio</label></td>
+        <td><select v-model="quick_ratio_selected">
+          <option v-for="option in options" v-bind:value="option.value">
+            {{ option.text }}
+          </option>
+        </select></td>
+        <td><input type="number" v-model="this.QuickRatio" placeholder=""></td>
+      </tr>
+
+
+      <tr>
+        <td>7</td>
+        <td><input type="checkbox" id="Current ratio" value="Current ratio" v-model="checkedNames"></td>
+        <td><label for="Current ratio">Current ratio</label></td>
+        <td><select v-model="current_ratio_selected">
+          <option v-for="option in options" v-bind:value="option.value">
+            {{ option.text }}
+          </option>
+        </select></td>
+        <td><input type="number" v-model="this.CurrentRatio" placeholder=""></td>
+      </tr>
+
+      <tr>
+        <td>8</td>
+        <td><input type="checkbox" id="Total Revenue" value="Total Revenue" v-model="checkedNames">
+        </td>
+        <td><label for="Total Revenue">Total Revenue</label></td>
+        <td><select v-model="total_revenue_selected">
+          <option v-for="option in options" v-bind:value="option.value">
+            {{ option.text }}
+          </option>
+        </select></td>
+        <td><input type="number" v-model="this.TotalRevenue" placeholder=""></td>
+      </tr>
+
+      <tr>
+        <td>9</td>
+        <td><input type="checkbox" id="Revenue per share" value="Revenue per share" v-model="checkedNames"></td>
+        <td><label for="Revenue per share">Revenue per share</label></td>
+        <td><select v-model="revenue_per_share_selected">
+          <option v-for="option in options" v-bind:value="option.value">
+            {{ option.text }}
+          </option>
+        </select></td>
+        <td><input type="number" v-model="this.RevenuePerShare" placeholder=""></td>
+      </tr>
+
+      <tr>
+        <td>10</td>
+        <td><input type="checkbox" id="Debt to equity" value="Debt to equity" v-model="checkedNames"></td>
+        <td><label for="Debt to equity">Debt to equity</label></td>
+        <td><select v-model="debt_to_equity_selected">
+          <option v-for="option in options" v-bind:value="option.value">
+            {{ option.text }}
+          </option>
+        </select></td>
+        <td><input type="number" v-model="this.DebtToEquity" placeholder=""></td>
+      </tr>
+
+      <tr>
+        <td>11</td>
+        <td><input type="checkbox" id="Roa" value="Roa" v-model="checkedNames"></td>
+        <td><label for="Roa">Roa</label></td>
+        <td><select v-model="roa_selected">
+          <option v-for="option in options" v-bind:value="option.value">
+            {{ option.text }}
+          </option>
+        </select></td>
+        <td><input type="number" v-model="this.Roa" placeholder=""></td>
+      </tr>
+
+      <tr>
+        <td>12</td>
+        <td><input type="checkbox" id="Roe" value="Roe" v-model="checkedNames"></td>
+        <td><label for="Roe">Roe</label></td>
+        <td><select v-model="roe_selected">
+          <option v-for="option in options" v-bind:value="option.value">
+            {{ option.text }}
+          </option>
+        </select></td>
+        <td><input type="number" v-model="this.Roe" placeholder=""></td>
+      </tr>
+
+      </tbody>
+    </table>
   </div>
-
 
   <h2>Table</h2>
   <table class="content-table">
@@ -181,27 +195,6 @@
         v-bind:stock="stock"
         v-bind:checkedNames="checkedNames"
     />
-    <!--    <tr>
-          <td>CLDX</td>
-          <td>Celldex Therapeutics, Inc.</td>
-          <td>Healthcare</td>
-          <td>Biotechnology</td>
-          <td>United States</td>
-        </tr>
-        <tr class="active-row">
-          <td>2</td>
-          <td>Sally</td>
-          <td>72,400</td>
-          <td>Students</td>
-          <td>dcodeewdwefw</td>
-        </tr>
-        <tr>
-          <td>3</td>
-          <td>Nick</td>
-          <td>52,300</td>
-          <td>dcode</td>
-          <td>dcodeewdwefw</td>
-        </tr>-->
     </tbody>
   </table>
 
@@ -210,16 +203,18 @@
 <script>
 
 import TableRow from "@/components/TableRow";
+import CountriesSelector from "@/components/CountriesSelector";
+import SectorIndustrySelector from "@/components/SectorIndustrySelector";
 
 export default {
-  components: {TableRow},
+  components: {TableRow, CountriesSelector, SectorIndustrySelector},
   data() {
     return {
+      isShowFilters: true,
       countries: [],
       sector: "",
       industry: "",
       stocks: [],
-      // employees: "",
       checkedNames: [],
 
       employees_selected: '>=',
@@ -287,6 +282,8 @@ export default {
 
       let params = []
 
+      if (this.sector !== "") params.push("sector=" + encodeURIComponent(this.sector))
+      if (this.industry !== "") params.push("industry=" + encodeURIComponent(this.industry))
       if (this.checkedNames.indexOf(this.EmployeesString) >= 0) params.push("employees=" + encodeURIComponent(this.getFilter(this.employees_selected) + this.Employees))
       if (this.checkedNames.indexOf(this.TotalCashString) >= 0) params.push("total cash=" + encodeURIComponent(this.getFilter(this.total_cash_selected) + this.TotalCash))
       if (this.checkedNames.indexOf(this.TotalCashPerShareString) >= 0) params.push("total cash per share=" + encodeURIComponent(this.getFilter(this.total_cash_per_share_selected) + this.TotalCashPerShare))
@@ -299,24 +296,8 @@ export default {
       if (this.checkedNames.indexOf(this.DebtToEquityString) >= 0) params.push("debt to equity=" + encodeURIComponent(this.getFilter(this.debt_to_equity_selected) + this.DebtToEquity))
       if (this.checkedNames.indexOf(this.RoaString) >= 0) params.push("roa=" + encodeURIComponent(this.getFilter(this.roa_selected) + this.Roa))
       if (this.checkedNames.indexOf(this.RoeString) >= 0) params.push("roe=" + encodeURIComponent(this.getFilter(this.roe_selected) + this.Roe))
+      if (this.countries.length > 0) params.push("countries=" + this.countries.join())
 
-      /*let url = "http://127.0.0.1:3000/table?" + [
-        "sector=" + encodeURIComponent(this.sector),
-        "industry=" + encodeURIComponent(this.industry),
-        "employees=" + encodeURIComponent(this.getFilter(this.employees_selected) + this.Employees),
-        "total cash=" + encodeURIComponent(this.getFilter(this.total_cash_selected) + this.TotalCash),
-        "total cash per share=" + encodeURIComponent(this.getFilter(this.total_cash_per_share_selected) + this.TotalCashPerShare),
-        "ebitda" + encodeURIComponent(this.getFilter(this.ebitda_selected) + this.Ebitda),
-        "total debt" + encodeURIComponent(this.getFilter(this.total_debt_selected) + this.TotalDebt),
-        "quick ratio" + encodeURIComponent(this.getFilter(this.quick_ratio_selected) + this.QuickRatio),
-        "current ratio" + encodeURIComponent(this.getFilter(this.current_ratio_selected) + this.CurrentRatio),
-        "total revenue" + encodeURIComponent(this.getFilter(this.total_revenue_selected) + this.TotalRevenue),
-        "revenue per share" + encodeURIComponent(this.getFilter(this.revenue_per_share_selected) + this.RevenuePerShare),
-        "debt to equity" + encodeURIComponent(this.getFilter(this.debt_to_equity_selected) + this.DebtToEquity),
-        "roa" + encodeURIComponent(this.getFilter(this.roa_selected) + this.Roa),
-        "roe" + encodeURIComponent(this.getFilter(this.roe_selected) + this.Roe),
-        "countries=" + this.countries.join(),
-      ].join("&")*/
       let url = "http://127.0.0.1:3000/table?" + params.join("&")
       fetch(url)
           .then(response => response.json())
@@ -329,12 +310,11 @@ export default {
               if (a.Symbol < b.Symbol) {
                 return -1;
               }
-              // a должно быть равным b
               return 0;
             })
           })
+
       console.log(url)
-      // console.log(this.getFilter(this.employees_selected))
     },
     isIn(string2) {
       return string2 in this.checkedNames
@@ -346,6 +326,13 @@ export default {
         return "<"
       } else if (filter === "=") {
         return ""
+      }
+    },
+    btnFilterText(){
+      if (this.isShowFilters){
+        return "Hide Filter Table"
+      } else {
+        return "Show Filter Table"
       }
     }
   },
@@ -457,7 +444,7 @@ export default {
 
 .content-table th,
 .content-table td {
-  padding: 12px 15px;
+  padding: 12px 25px;
 }
 
 .content-table tbody tr {
