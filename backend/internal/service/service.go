@@ -254,7 +254,7 @@ func (s *Service) filerStocks(ctx context.Context, filter interface{}, page int6
 		{"financial data.financial currency", 1},
 	}
 
-	var limit int64 = 50
+	var limit int64 = 40
 
 	stocks := []model.TableFilterData{}
 	paginatedData, err := New(s.collection).Context(ctx).Limit(limit).Page(page).Sort("symbol", 1).Select(projection).Filter(filter).Decode(&stocks).Find()

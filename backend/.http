@@ -44,4 +44,4 @@ POST http://127.0.0.1:3000/import
 
 #http://127.0.0.1:3000/table?roa=0.04759
 
-http://127.0.0.1:3000/table?offset=0
+http://127.0.0.1:3000/table?page=1
