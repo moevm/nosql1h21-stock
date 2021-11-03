@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"nosql1h21-stock-backend/backend/internal/model"
 	"nosql1h21-stock-backend/backend/internal/service"
+	"strconv"
 	"strings"
 )
 
@@ -13,7 +14,7 @@ type TableHandler struct {
 }
 
 type TableService interface {
-	TableFilter(ctx context.Context, r service.TableFilterRequest) (stocks []model.TableFilterData, _ error)
+	TableFilter(ctx context.Context, r service.TableFilterRequest, page int64) (model.TableData, error)
 }
 
 func (h *TableHandler) Method() string {
@@ -25,6 +26,21 @@ func (h *TableHandler) Path() string {
 }
 
 func (h *TableHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	page := r.FormValue("page")
+	var numberPage int64 = 0
+
+	if page != "" {
+		number, err := strconv.ParseInt(page, 10, 64)
+		if err != nil {
+			writeResponse(w, r, badRequest{err.Error()})
+			return
+		}
+		if number < 0 {
+			writeResponse(w, r, badRequest{err.Error()})
+			return
+		}
+		numberPage = number
+	}
 
 	rawCountries := r.FormValue("countries")
 	countries := []string(nil)
@@ -50,7 +66,7 @@ func (h *TableHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		CountriesFilter:   countries,
 	}
 
-	stocks, err := h.Service.TableFilter(r.Context(), searchRequest)
+	stocks, err := h.Service.TableFilter(r.Context(), searchRequest, numberPage)
 
 	if err != nil {
 		writeResponse(w, r, badRequest{err.Error()})

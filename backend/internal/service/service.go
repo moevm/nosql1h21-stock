@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 
+	. "github.com/gobeam/mongo-go-pagination"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -230,26 +231,43 @@ type TableFilterRequest struct {
 	ReturnOnEquity    string
 }
 
-func (s *Service) filerStocks(ctx context.Context, filter interface{}) (stocks []model.TableFilterData, _ error) {
-	cur, err := s.collection.Find(ctx, filter)
-	if err != nil {
-		return nil, err
-	}
-	defer cur.Close(ctx)
+func (s *Service) filerStocks(ctx context.Context, filter interface{}, page int64) (model.TableData, error) {
 
-	stocks = []model.TableFilterData{}
-	for cur.Next(ctx) {
-		var stock model.TableFilterData
-		err := cur.Decode(&stock)
-		if err != nil {
-			return nil, err
-		}
-		stocks = append(stocks, stock)
+	projection := bson.D{
+		{"symbol", 1},
+		{"long name", 1},
+		{"industry", 1},
+		{"sector", 1},
+		{"staff.employees", 1},
+		{"locate.country", 1},
+		{"financial data.total cash", 1},
+		{"financial data.total cash per share", 1},
+		{"financial data.ebitda", 1},
+		{"financial data.total debt", 1},
+		{"financial data.quick ratio", 1},
+		{"financial data.current ratio", 1},
+		{"financial data.total revenue", 1},
+		{"financial data.revenue per share", 1},
+		{"financial data.debt to equity", 1},
+		{"financial data.roa", 1},
+		{"financial data.roe", 1},
+		{"financial data.financial currency", 1},
 	}
-	if err := cur.Err(); err != nil {
-		return nil, err
+
+	var limit int64 = 50
+
+	stocks := []model.TableFilterData{}
+	paginatedData, err := New(s.collection).Context(ctx).Limit(limit).Page(page).Sort("symbol", 1).Select(projection).Filter(filter).Decode(&stocks).Find()
+
+	if err != nil {
+		return model.TableData{}, err
 	}
-	return stocks, nil
+
+	return model.TableData{
+		Stocks:    stocks,
+		Page:      page,
+		TotalPage: paginatedData.Pagination.TotalPage,
+	}, nil
 }
 
 func setFilterForIntValue(value string, filterValue string, filter *bson.M) {
@@ -300,7 +318,7 @@ func setFilterForFloatValue(value string, filterValue string, filter *bson.M) {
 	}
 }
 
-func (s *Service) TableFilter(ctx context.Context, r TableFilterRequest) (stocks []model.TableFilterData, _ error) {
+func (s *Service) TableFilter(ctx context.Context, r TableFilterRequest, page int64) (model.TableData, error) {
 	filter := bson.M{}
 
 	if r.SectorFilter != "" {
@@ -363,5 +381,5 @@ func (s *Service) TableFilter(ctx context.Context, r TableFilterRequest) (stocks
 		setFilterForFloatValue(r.ReturnOnEquity, "financial data.roe", &filter)
 	}
 
-	return s.filerStocks(ctx, filter)
+	return s.filerStocks(ctx, filter, page)
 }

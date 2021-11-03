@@ -42,4 +42,6 @@ POST http://127.0.0.1:3000/import
 
 #GET http://127.0.0.1:3000/table?ebitda=>61696000000
 
-http://127.0.0.1:3000/table?roa=0.04759
+#http://127.0.0.1:3000/table?roa=0.04759
+
+http://127.0.0.1:3000/table?offset=0

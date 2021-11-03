@@ -82,6 +82,12 @@ type Quarter struct {
 	Earnings int
 }
 
+type TableData struct {
+	Stocks    []TableFilterData
+	TotalPage int64
+	Page      int64
+}
+
 type TableFilterData struct {
 	Symbol   string
 	Name     string `bson:"short name,omitempty"`
