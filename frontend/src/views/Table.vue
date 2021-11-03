@@ -198,6 +198,20 @@
     </tbody>
   </table>
 
+  <br>
+
+<!--  <label>0</label> <label>1</label> <label>2</label> <label>...</label> <label>101</label> <label>102</label>-->
+
+  <Pages
+      v-if="totalPages>0"
+      v-bind:page="page"
+      v-bind:total-page="totalPages"
+      v-on:nextClick="nextClick"
+      v-on:prevClick="prevClick"
+  />
+
+
+
 </template>
 
 <script>
@@ -205,9 +219,10 @@
 import TableRow from "@/components/TableRow";
 import CountriesSelector from "@/components/CountriesSelector";
 import SectorIndustrySelector from "@/components/SectorIndustrySelector";
+import Pages from "@/components/Pages";
 
 export default {
-  components: {TableRow, CountriesSelector, SectorIndustrySelector},
+  components: {Pages, TableRow, CountriesSelector, SectorIndustrySelector},
   data() {
     return {
       isShowFilters: true,
@@ -216,6 +231,8 @@ export default {
       industry: "",
       stocks: [],
       checkedNames: [],
+      page: 1,
+      totalPages: 0,
 
       employees_selected: '>=',
       total_cash_selected: '>=',
@@ -282,6 +299,7 @@ export default {
 
       let params = []
 
+      params.push("page=" + encodeURIComponent(this.page))
       if (this.sector !== "") params.push("sector=" + encodeURIComponent(this.sector))
       if (this.industry !== "") params.push("industry=" + encodeURIComponent(this.industry))
       if (this.checkedNames.indexOf(this.EmployeesString) >= 0) params.push("employees=" + encodeURIComponent(this.getFilter(this.employees_selected) + this.Employees))
@@ -301,20 +319,10 @@ export default {
       let url = "http://127.0.0.1:3000/table?" + params.join("&")
       fetch(url)
           .then(response => response.json())
-          .then(stocks => {
-            this.stocks = stocks
-            this.stocks.sort(function (a, b) {
-              if (a.Symbol > b.Symbol) {
-                return 1;
-              }
-              if (a.Symbol < b.Symbol) {
-                return -1;
-              }
-              return 0;
-            })
+          .then(result => {
+            this.stocks = result.Stocks
+            this.totalPages = result.TotalPage
           })
-
-      console.log(url)
     },
     isIn(string2) {
       return string2 in this.checkedNames
@@ -334,9 +342,22 @@ export default {
       } else {
         return "Show Filter Table"
       }
+    },
+    prevClick(){
+      this.page--
+    },
+    nextClick(){
+      this.page++
     }
   },
   watch: {
+    page(){
+      this.update()
+    },
+    checkedNames(){
+      this.update()
+      this.page = 1
+    },
     countries() {
       this.update()
     },
