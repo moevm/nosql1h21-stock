@@ -235,7 +235,7 @@ func (s *Service) filerStocks(ctx context.Context, filter interface{}, page int6
 
 	projection := bson.D{
 		{"symbol", 1},
-		{"long name", 1},
+		{"short name", 1},
 		{"industry", 1},
 		{"sector", 1},
 		{"staff.employees", 1},
