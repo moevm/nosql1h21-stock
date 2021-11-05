@@ -50,6 +50,6 @@ export default {
     margin: 0 auto;
   }
   select {
-    height: 300px;
+    height: 100px;
   }
 </style>

@@ -1,18 +1,15 @@
 <template>
-
   <button v-on:click="isShowFilters = !isShowFilters">{{btnFilterText()}}</button>
-
   <div v-show="isShowFilters">
     <div>
-      <CountriesSelector @update:countries="countries = $event"/>
-      <SectorIndustrySelector @update:sector="sector = $event" @update:industry="industry = $event"/>
+      <CountriesSelector v-if="disable!='country'" @update:countries="countries = $event"/>
+      <SectorIndustrySelector v-if="disable!='sector' && disable!='industry'" @update:sector="sector = $event" @update:industry="industry = $event"/>
       <br>
     </div>
 
     <table class="content-table">
       <tbody>
       <tr>
-        <td>1</td>
         <td><input type="checkbox" id="Employees" value="Employees" v-model="checkedNames"></td>
         <td><label for="Employees">Employees</label></td>
         <td>
@@ -26,7 +23,6 @@
       </tr>
 
       <tr>
-        <td>2</td>
         <td><input type="checkbox" id="Total Cash" value="Total Cash" v-model="checkedNames"></td>
         <td><label for="Total Cash">Total Cash</label></td>
         <td><select v-model="total_cash_selected">
@@ -38,7 +34,6 @@
       </tr>
 
       <tr>
-        <td>3</td>
         <td><input type="checkbox" id="Total Cash per share" value="Total Cash per share" v-model="checkedNames"></td>
         <td><label for="Total Cash per share">Total Cash per share</label></td>
         <td><select v-model="total_cash_per_share_selected">
@@ -50,7 +45,6 @@
       </tr>
 
       <tr>
-        <td>4</td>
         <td><input type="checkbox" id="Ebitda" value="Ebitda" v-model="checkedNames"></td>
         <td><label for="Ebitda">Ebitda</label></td>
         <td><select v-model="ebitda_selected">
@@ -62,7 +56,6 @@
       </tr>
 
       <tr>
-        <td>5</td>
         <td><input type="checkbox" id="Total Debt" value="Total Debt" v-model="checkedNames"></td>
         <td><label for="Total Debt">Total Debt</label></td>
         <td><select v-model="total_debt_selected">
@@ -75,7 +68,6 @@
 
 
       <tr>
-        <td>6</td>
         <td><input type="checkbox" id="Quick ratio" value="Quick ratio" v-model="checkedNames"></td>
         <td><label for="Quick ratio">Quick ratio</label></td>
         <td><select v-model="quick_ratio_selected">
@@ -88,7 +80,6 @@
 
 
       <tr>
-        <td>7</td>
         <td><input type="checkbox" id="Current ratio" value="Current ratio" v-model="checkedNames"></td>
         <td><label for="Current ratio">Current ratio</label></td>
         <td><select v-model="current_ratio_selected">
@@ -100,7 +91,6 @@
       </tr>
 
       <tr>
-        <td>8</td>
         <td><input type="checkbox" id="Total Revenue" value="Total Revenue" v-model="checkedNames">
         </td>
         <td><label for="Total Revenue">Total Revenue</label></td>
@@ -113,7 +103,6 @@
       </tr>
 
       <tr>
-        <td>9</td>
         <td><input type="checkbox" id="Revenue per share" value="Revenue per share" v-model="checkedNames"></td>
         <td><label for="Revenue per share">Revenue per share</label></td>
         <td><select v-model="revenue_per_share_selected">
@@ -125,7 +114,6 @@
       </tr>
 
       <tr>
-        <td>10</td>
         <td><input type="checkbox" id="Debt to equity" value="Debt to equity" v-model="checkedNames"></td>
         <td><label for="Debt to equity">Debt to equity</label></td>
         <td><select v-model="debt_to_equity_selected">
@@ -137,7 +125,6 @@
       </tr>
 
       <tr>
-        <td>11</td>
         <td><input type="checkbox" id="Roa" value="Roa" v-model="checkedNames"></td>
         <td><label for="Roa">Roa</label></td>
         <td><select v-model="roa_selected">
@@ -149,7 +136,6 @@
       </tr>
 
       <tr>
-        <td>12</td>
         <td><input type="checkbox" id="Roe" value="Roe" v-model="checkedNames"></td>
         <td><label for="Roe">Roe</label></td>
         <td><select v-model="roe_selected">
@@ -162,77 +148,25 @@
 
       </tbody>
     </table>
+    <br>
   </div>
-
-  <h2>Table</h2>
-  <table class="content-table">
-
-
-    <thead>
-    <tr>
-      <th>Ticker</th>
-      <th>Name</th>
-      <th>Sector</th>
-      <th>Industry</th>
-      <th>Country</th>
-      <th v-if="this.checkedNames.indexOf(this.EmployeesString) >= 0">Employees</th>
-      <th v-if="this.checkedNames.indexOf(this.TotalCashString) >= 0">Total Cash</th>
-      <th v-if="this.checkedNames.indexOf(this.TotalCashPerShareString) >= 0">Total Cash per share</th>
-      <th v-if="this.checkedNames.indexOf(this.EbitdaString) >= 0">Ebitda</th>
-      <th v-if="this.checkedNames.indexOf(this.TotalDebtString) >= 0">Total Debt</th>
-      <th v-if="this.checkedNames.indexOf(this.QuickRatioString) >= 0">Quick ratio</th>
-      <th v-if="this.checkedNames.indexOf(this.CurrentRatioString) >= 0">Current ratio</th>
-      <th v-if="this.checkedNames.indexOf(this.TotalRevenueString) >= 0">Total Revenue</th>
-      <th v-if="this.checkedNames.indexOf(this.RevenuePerShareString) >= 0">Revenue per share</th>
-      <th v-if="this.checkedNames.indexOf(this.DebtToEquityString) >= 0">Debt to equity</th>
-      <th v-if="this.checkedNames.indexOf(this.RoaString) >= 0">Roa</th>
-      <th v-if="this.checkedNames.indexOf(this.RoeString) >= 0">Roe</th>
-    </tr>
-    </thead>
-    <tbody>
-    <TableRow
-        v-for="stock of stocks" :key="stock.Symbol"
-        v-bind:stock="stock"
-        v-bind:checkedNames="checkedNames"
-    />
-    </tbody>
-  </table>
-
-  <br>
-
-<!--  <label>0</label> <label>1</label> <label>2</label> <label>...</label> <label>101</label> <label>102</label>-->
-
-  <Pages
-      v-if="totalPages>0"
-      v-bind:page="page"
-      v-bind:total-page="totalPages"
-      v-on:nextClick="nextClick"
-      v-on:prevClick="prevClick"
-  />
-
-
-
 </template>
 
 <script>
-
-import TableRow from "@/components/TableRow";
 import CountriesSelector from "@/components/CountriesSelector";
 import SectorIndustrySelector from "@/components/SectorIndustrySelector";
-import Pages from "@/components/Pages";
 
 export default {
-  components: {Pages, TableRow, CountriesSelector, SectorIndustrySelector},
+  components: {CountriesSelector, SectorIndustrySelector},
+  props: ["disable"],
+  emits: ["update:filter"],
   data() {
     return {
-      isShowFilters: true,
+      isShowFilters: false,
       countries: [],
       sector: "",
       industry: "",
-      stocks: [],
       checkedNames: [],
-      page: 1,
-      totalPages: 0,
 
       employees_selected: '>=',
       total_cash_selected: '>=',
@@ -267,39 +201,10 @@ export default {
       Roe: 0,
     }
   },
-  created() {
-    this.EmployeesString = "Employees"
-    this.TotalCashString = "Total Cash"
-    this.TotalCashPerShareString = "Total Cash per share"
-    this.EbitdaString = "Ebitda"
-    this.TotalDebtString = "Total Debt"
-    this.QuickRatioString = "Quick ratio"
-    this.CurrentRatioString = "Current ratio"
-    this.TotalRevenueString = "Total Revenue"
-    this.RevenuePerShareString = "Revenue per share"
-    this.DebtToEquityString = "Debt to equity"
-    this.RoaString = "Roa"
-    this.RoeString = "Roe"
-    this.Employees = 0
-    this.TotalCash = 0
-    this.TotalCashPerShare = 0
-    this.Ebitda = 0
-    this.TotalDebt = 0
-    this.QuickRatio = 0
-    this.CurrentRatio = 0
-    this.TotalRevenue = 0
-    this.RevenuePerShare = 0
-    this.DebtToEquity = 0
-    this.Roa = 0
-    this.Roe = 0
-    this.update()
-  },
   methods: {
     update() {
-
       let params = []
 
-      params.push("page=" + encodeURIComponent(this.page))
       if (this.sector !== "") params.push("sector=" + encodeURIComponent(this.sector))
       if (this.industry !== "") params.push("industry=" + encodeURIComponent(this.industry))
       if (this.checkedNames.indexOf(this.EmployeesString) >= 0) params.push("employees=" + encodeURIComponent(this.getFilter(this.employees_selected) + this.Employees))
@@ -316,16 +221,7 @@ export default {
       if (this.checkedNames.indexOf(this.RoeString) >= 0) params.push("roe=" + encodeURIComponent(this.getFilter(this.roe_selected) + this.Roe))
       if (this.countries.length > 0) params.push("countries=" + this.countries.join())
 
-      let url = "http://127.0.0.1:3000/table?" + params.join("&")
-      fetch(url)
-          .then(response => response.json())
-          .then(result => {
-            this.stocks = result.Stocks
-            this.totalPages = result.TotalPage
-          })
-    },
-    isIn(string2) {
-      return string2 in this.checkedNames
+      this.$emit("update:filter", params.join("&"))
     },
     getFilter(filter) {
       if (filter === ">=") {
@@ -336,24 +232,15 @@ export default {
         return ""
       }
     },
-    btnFilterText(){
+    btnFilterText() {
       if (this.isShowFilters){
-        return "Hide Filter Table"
+        return "Hide Filter"
       } else {
-        return "Show Filter Table"
+        return "Show Filter"
       }
     },
-    prevClick(){
-      this.page--
-    },
-    nextClick(){
-      this.page++
-    }
   },
   watch: {
-    page(){
-      this.update()
-    },
     checkedNames(){
       this.update()
       this.page = 1
@@ -439,14 +326,37 @@ export default {
     Roe() {
       this.update()
     },
+  },
+  created() {
+    this.EmployeesString = "Employees"
+    this.TotalCashString = "Total Cash"
+    this.TotalCashPerShareString = "Total Cash per share"
+    this.EbitdaString = "Ebitda"
+    this.TotalDebtString = "Total Debt"
+    this.QuickRatioString = "Quick ratio"
+    this.CurrentRatioString = "Current ratio"
+    this.TotalRevenueString = "Total Revenue"
+    this.RevenuePerShareString = "Revenue per share"
+    this.DebtToEquityString = "Debt to equity"
+    this.RoaString = "Roa"
+    this.RoeString = "Roe"
+    this.Employees = 0
+    this.TotalCash = 0
+    this.TotalCashPerShare = 0
+    this.Ebitda = 0
+    this.TotalDebt = 0
+    this.QuickRatio = 0
+    this.CurrentRatio = 0
+    this.TotalRevenue = 0
+    this.RevenuePerShare = 0
+    this.DebtToEquity = 0
+    this.Roa = 0
+    this.Roe = 0
   }
 }
 </script>
 
 <style scoped>
-th {
-  text-align: center;
-}
 
 .content-table {
   margin: 0 auto;
@@ -487,5 +397,7 @@ th {
   font-weight: bold;
   color: #009879;
 }
-
+button {
+  margin-bottom: 10px;
+}
 </style>

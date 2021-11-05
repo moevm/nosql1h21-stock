@@ -170,27 +170,37 @@ func (s *Service) Import(ctx context.Context, jsonEncoded io.Reader) error {
 
 type CountItem struct {
 	Key    string `bson:"_id"`
-	Amount int
+	Amount float64
+	Unit   string
 }
 
-type ErrInvalidArgument struct{}
+type ErrInvalidArgument struct {
+	Arg string
+}
 
 func (e ErrInvalidArgument) Error() string {
-	return "Invalid argument"
+	if e.Arg != "" {
+		e.Arg = " '" + e.Arg + "'"
+	}
+	return "Invalid argument" + e.Arg
 }
 
-func (s *Service) Count(ctx context.Context, by string) ([]CountItem, error) {
-	switch by {
+func (s *Service) AggregateCountCompanies(ctx context.Context, in string, filter FilterRequest) ([]CountItem, error) {
+	mongoFilter := bson.M{}
+	setFilter(filter, mongoFilter)
+
+	switch in {
 	case "sector", "industry":
 		break
 	case "country":
-		by = "locate.country"
+		in = "locate.country"
 	default:
-		return nil, ErrInvalidArgument{}
+		return nil, ErrInvalidArgument{"in"}
 	}
 
 	cur, err := s.collection.Aggregate(ctx, bson.A{
-		bson.M{"$group": bson.M{"_id": "$" + by, "amount": bson.M{"$sum": 1}}},
+		bson.M{"$match": mongoFilter},
+		bson.M{"$group": bson.M{"_id": "$" + in, "amount": bson.M{"$sum": 1}}},
 		bson.M{"$sort": bson.M{"amount": -1}},
 	})
 	if err != nil {
@@ -213,7 +223,72 @@ func (s *Service) Count(ctx context.Context, by string) ([]CountItem, error) {
 	return items, nil
 }
 
-type TableFilterRequest struct {
+func (s *Service) AggregateAverage(ctx context.Context, property, in string, filter FilterRequest) ([]CountItem, error) {
+	mongoFilter := bson.M{}
+	setFilter(filter, mongoFilter)
+
+	switch in {
+	case "sector", "industry":
+		break
+	case "country":
+		in = "locate.country"
+	default:
+		return nil, ErrInvalidArgument{"in"}
+	}
+
+	switch property {
+	case "employees":
+		property = "staff.employees"
+	case "quick ratio":
+		property = "financial data.quick ratio"
+	case "current ratio":
+		property = "financial data.current ratio"
+	case "debt to equity":
+		property = "financial data.debt to equity"
+	case "roa":
+		property = "financial data.roa"
+	case "roe":
+		property = "financial data.roe"
+	default:
+		return nil, ErrInvalidArgument{"property"}
+	}
+
+	cur, err := s.collection.Aggregate(ctx, bson.A{
+		bson.M{"$match": mongoFilter},
+		bson.M{"$group": bson.M{"_id": "$" + in, "amount": bson.M{"$avg": "$" + property}}},
+		bson.M{"$sort": bson.M{"amount": -1}},
+	})
+	if err != nil {
+		return nil, err
+	}
+	defer cur.Close(ctx)
+
+	items := []CountItem{}
+	for cur.Next(ctx) {
+		var item CountItem
+		err := cur.Decode(&item)
+		if err != nil {
+			return nil, err
+		}
+		items = append(items, item)
+	}
+	if err := cur.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+func (s *Service) Aggregate(ctx context.Context, mode, property, in string, filter FilterRequest) ([]CountItem, error) {
+	switch mode {
+	case "count":
+		return s.AggregateCountCompanies(ctx, in, filter)
+	case "average":
+		return s.AggregateAverage(ctx, property, in, filter)
+	}
+	return nil, ErrInvalidArgument{"mode"}
+}
+
+type FilterRequest struct {
 	SectorFilter      string
 	IndustryFilter    string
 	EmployeesFilter   string
@@ -318,9 +393,7 @@ func setFilterForFloatValue(value string, filterValue string, filter *bson.M) {
 	}
 }
 
-func (s *Service) TableFilter(ctx context.Context, r TableFilterRequest, page int64) (model.TableData, error) {
-	filter := bson.M{}
-
+func setFilter(r FilterRequest, filter bson.M) {
 	if r.SectorFilter != "" {
 		filter["sector"] = r.SectorFilter
 	}
@@ -380,6 +453,12 @@ func (s *Service) TableFilter(ctx context.Context, r TableFilterRequest, page in
 	if r.ReturnOnEquity != "" {
 		setFilterForFloatValue(r.ReturnOnEquity, "financial data.roe", &filter)
 	}
+}
+
+func (s *Service) TableFilter(ctx context.Context, r FilterRequest, page int64) (model.TableData, error) {
+	filter := bson.M{}
+
+	setFilter(r, filter)
 
 	return s.filerStocks(ctx, filter, page)
 }

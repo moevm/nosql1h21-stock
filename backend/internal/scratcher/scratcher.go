@@ -51,6 +51,10 @@ func Scratch(ctx context.Context, collection *mongo.Collection) {
 				companyInfo.FinancialData == nil ||
 				companyInfo.FinancialData.TotalCash == 0 ||
 				companyInfo.Earnings.FinancialCurrency == ""
+				// companyInfo.AssetProfile.FullTimeEmployees == 0
+				// companyInfo.FinancialData.QuickRatio == 0 ||
+				// companyInfo.FinancialData.CurrentRatio == 0 ||
+				// companyInfo.FinancialData.DebtToEquity == 0
 			if incompleteInfo {
 				log.Printf("Company with ticker %v excluded because of incomplete info\n", ticker)
 				return
