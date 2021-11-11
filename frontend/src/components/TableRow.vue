@@ -1,5 +1,5 @@
 <template>
-  <tr>
+  <tr v-on:click="clickOnRow">
     <td>{{ stock.Symbol }}</td>
     <td>{{ stock.Name }}</td>
     <td>{{ stock.Sector }}</td>
@@ -49,7 +49,6 @@ export default {
     this.Roe = "Roe"
   },
   methods: {
-
     currency(amount, name) {
       let factors = ["K", "M", "B", "T"]
       let factor = ""
@@ -62,6 +61,9 @@ export default {
         factor = factors[i]
       }
       return amount + factor + " " + name
+    },
+    clickOnRow(event) {
+      this.$router.push('/stock/' + this.stock.Symbol)
     }
   }
 }
